@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
 
   // Redirect authenticated users trying to access auth pages
   if (isPublicPath && token) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // Redirect unauthenticated users trying to access protected pages
@@ -29,7 +29,7 @@ export function middleware(request: NextRequest) {
 // Add paths that should be protected by authentication
 export const config = {
   matcher: [
-    '/dashboard/:path*',
+    '//:path*',
     '/profile/:path*',
     '/settings/:path*',
     '/signin',

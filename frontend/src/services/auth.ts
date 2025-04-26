@@ -31,8 +31,18 @@ class AuthService {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Something went wrong');
+      const errorData = await response.json();
+      console.error('API Error:', errorData);
+      
+      if (errorData.error && errorData.error.errors) {
+        // Handle validation errors
+        const validationErrors = errorData.error.errors
+          .map((err: any) => err.msg)
+          .join(', ');
+        throw new Error(validationErrors);
+      }
+      
+      throw new Error(errorData.error?.message || errorData.message || 'Something went wrong');
     }
 
     return response.json();
@@ -44,11 +54,13 @@ class AuthService {
       body: JSON.stringify(data),
     });
 
-    this.token = response.token;
-    // Set cookie with token (expires in 7 days)
-    Cookies.set('token', response.token, { expires: 7 });
+    if (response.data && response.data.token) {
+      this.token = response.data.token;
+      // Set cookie with token (expires in 7 days)
+      Cookies.set('token', response.data.token, { expires: 7 });
+    }
     
-    return response;
+    return response.data;
   }
 
   async login(data: SignInData): Promise<AuthResponse> {
@@ -57,11 +69,13 @@ class AuthService {
       body: JSON.stringify(data),
     });
 
-    this.token = response.token;
-    // Set cookie with token (expires in 7 days)
-    Cookies.set('token', response.token, { expires: 7 });
+    if (response.data && response.data.token) {
+      this.token = response.data.token;
+      // Set cookie with token (expires in 7 days)
+      Cookies.set('token', response.data.token, { expires: 7 });
+    }
     
-    return response;
+    return response.data;
   }
 
   async getCurrentUser(): Promise<User> {

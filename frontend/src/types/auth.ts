@@ -1,6 +1,7 @@
 export interface User {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
 }
 
@@ -12,7 +13,8 @@ export interface AuthState {
 }
 
 export interface SignUpData {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }

@@ -40,7 +40,7 @@ if (config.nodeEnv === 'development') {
 }
 
 // API Routes
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 
 // Error Handling
 app.use(notFound);
