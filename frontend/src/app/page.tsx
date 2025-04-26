@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -32,7 +33,7 @@ export default function Home() {
             <div className="flex items-center">
               <span className="text-white text-xl font-bold">InvestPro</span>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 items-center">
               <button
                 onClick={() => setActiveTab('dashboard')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -53,6 +54,18 @@ export default function Home() {
               >
                 Investment
               </button>
+              <Link
+                href="/signin"
+                className="px-4 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                className="px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              >
+                Sign Up
+              </Link>
             </div>
           </div>
         </div>
