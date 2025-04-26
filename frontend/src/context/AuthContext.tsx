@@ -1,111 +1,68 @@
 'use client';
-import { createContext, useContext, useReducer, ReactNode } from 'react';
-import Cookies from 'js-cookie';
-import { authService } from '@/services/auth';
-import { AuthState, User } from '@/types/auth';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { User } from '@/types/auth';
 
-// Initial auth state
-const initialState: AuthState = {
-  user: null,
-  isAuthenticated: false,
-  isLoading: false,
-  error: null,
-};
-
-// Auth action types
-type AuthAction =
-  | { type: 'AUTH_START' }
-  | { type: 'AUTH_SUCCESS'; payload: User }
-  | { type: 'AUTH_ERROR'; payload: string }
-  | { type: 'AUTH_LOGOUT' };
-
-// Auth reducer
-const authReducer = (state: AuthState, action: AuthAction): AuthState => {
-  switch (action.type) {
-    case 'AUTH_START':
-      return {
-        ...state,
-        isLoading: true,
-        error: null,
-      };
-    case 'AUTH_SUCCESS':
-      return {
-        ...state,
-        isLoading: false,
-        isAuthenticated: true,
-        user: action.payload,
-        error: null,
-      };
-    case 'AUTH_ERROR':
-      return {
-        ...state,
-        isLoading: false,
-        isAuthenticated: false,
-        user: null,
-        error: action.payload,
-      };
-    case 'AUTH_LOGOUT':
-      return {
-        ...state,
-        isAuthenticated: false,
-        user: null,
-        error: null,
-      };
-    default:
-      return state;
-  }
-};
-
-// Create auth context
-interface AuthContextType extends AuthState {
-  login: (user: User) => void;
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  login: (token: string, user: User) => void;
   logout: () => void;
-  startLoading: () => void;
-  setError: (error: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Auth context provider
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const login = (user: User) => {
-    dispatch({ type: 'AUTH_SUCCESS', payload: user });
-  };
-
-  const logout = async () => {
-    try {
-      await authService.logout(); // Call the logout API endpoint
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      Cookies.remove('token'); // Remove the cookie
-      localStorage.removeItem('token');
-      dispatch({ type: 'AUTH_LOGOUT' });
+  useEffect(() => {
+    // Check authentication status on mount
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
+    if (token && storedUser) {
+      const user = JSON.parse(storedUser);
+      setUser(user);
+      setIsAuthenticated(true);
     }
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const publicPaths = ['/signin', '/signup', '/'];
+
+    if (!token && !publicPaths.includes(pathname)) {
+      router.push('/signin');
+    } else if (token && (pathname === '/signin' || pathname === '/signup')) {
+      router.push('/');
+    }
+  }, [pathname, router]);
+
+  const login = (token: string, user: User) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    setUser(user);
+    setIsAuthenticated(true);
   };
 
-  const startLoading = () => {
-    dispatch({ type: 'AUTH_START' });
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
+    router.push('/signin');
   };
 
-  const setError = (error: string) => {
-    dispatch({ type: 'AUTH_ERROR', payload: error });
-  };
-
-  const value = {
-    ...state,
-    login,
-    logout,
-    startLoading,
-    setError,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-// Custom hook to use auth context
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

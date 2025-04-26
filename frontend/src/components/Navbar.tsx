@@ -16,7 +16,7 @@ export default function Navbar() {
     <nav className="bg-black border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center">
               <span className="text-xl font-bold text-white">InvestPro</span>
             </Link>

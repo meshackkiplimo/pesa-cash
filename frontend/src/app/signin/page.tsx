@@ -35,7 +35,7 @@ export default function SignIn() {
         password,
       });
       
-      login(response.user);
+      login(response.token, response.user);
       router.replace('/'); // Use replace instead of push
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid email or password');
