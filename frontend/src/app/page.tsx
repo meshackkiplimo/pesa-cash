@@ -26,51 +26,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Navigation Bar */}
-      <nav className="bg-black border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <span className="text-white text-xl font-bold">InvestPro</span>
-            </div>
-            <div className="flex space-x-4 items-center">
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === 'dashboard'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800'
-                }`}
-              >
-                Dashboard
-              </button>
-              <button
-                onClick={() => setActiveTab('investment')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === 'investment'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800'
-                }`}
-              >
-                Investment
-              </button>
-              <Link
-                href="/signin"
-                className="px-4 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                className="px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-              >
-                Sign Up
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       <main className="max-w-7xl mx-auto px-4 py-8">
         {activeTab === 'dashboard' ? (
           <div className="space-y-6">

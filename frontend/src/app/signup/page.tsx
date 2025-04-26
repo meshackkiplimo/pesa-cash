@@ -2,12 +2,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/auth';
 
 export default function SignUp() {
   const router = useRouter();
-  const { login } = useAuth();
   
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -43,11 +41,12 @@ export default function SignUp() {
       });
       
       if (response.user) {
-        login(response.user);
+        // Set success message for signin page
+        localStorage.setItem('registrationSuccess', 'Registration successful! Please sign in with your credentials.');
+        router.replace('/signin'); // Use replace instead of push
       } else {
         throw new Error('Invalid response format from server');
       }
-      router.push('/signin'); // Redirect to dashboard after successful signup
     } catch (err) {
       console.error('Signup error:', err);
       setError(err instanceof Error ? err.message : 'Something went wrong');

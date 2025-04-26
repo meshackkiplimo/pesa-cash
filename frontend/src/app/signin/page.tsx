@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -12,7 +12,17 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Check for registration success message
+    const registrationSuccess = localStorage.getItem('registrationSuccess');
+    if (registrationSuccess) {
+      setSuccess(registrationSuccess);
+      localStorage.removeItem('registrationSuccess');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +36,7 @@ export default function SignIn() {
       });
       
       login(response.user);
-      router.push('/'); // Redirect to dashboard after successful login
+      router.replace('/'); // Use replace instead of push
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid email or password');
     } finally {
@@ -42,6 +52,11 @@ export default function SignIn() {
             Sign in to your account
           </h2>
         </div>
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span className="block sm:inline">{success}</span>
+          </div>
+        )}
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
             <span className="block sm:inline">{error}</span>

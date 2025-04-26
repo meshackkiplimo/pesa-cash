@@ -1,5 +1,7 @@
 'use client';
 import { createContext, useContext, useReducer, ReactNode } from 'react';
+import Cookies from 'js-cookie';
+import { authService } from '@/services/auth';
 import { AuthState, User } from '@/types/auth';
 
 // Initial auth state
@@ -72,9 +74,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'AUTH_SUCCESS', payload: user });
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    dispatch({ type: 'AUTH_LOGOUT' });
+  const logout = async () => {
+    try {
+      await authService.logout(); // Call the logout API endpoint
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      Cookies.remove('token'); // Remove the cookie
+      localStorage.removeItem('token');
+      dispatch({ type: 'AUTH_LOGOUT' });
+    }
   };
 
   const startLoading = () => {
