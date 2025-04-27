@@ -6,6 +6,8 @@ const router = express.Router();
 
 // Protected routes (require authentication)
 router.post('/', auth, investmentController.createInvestment);
+router.get('/', auth, investmentController.getInvestments);
+router.get('/stats', auth, investmentController.getStats);
 router.get('/payment-status/:checkoutRequestId', auth, investmentController.checkPaymentStatus);
 
 // M-Pesa callback URL (public)

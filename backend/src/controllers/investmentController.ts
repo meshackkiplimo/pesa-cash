@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { mpesaService } from '../services/mpesa';
 
+import { Investment } from '../models/Investment';
+
 interface InvestmentRequest {
   amount: number;
   phoneNumber: string;
@@ -100,6 +102,68 @@ export const investmentController = {
       res.status(500).json({
         status: 'error',
         message: 'Failed to check payment status'
+      });
+    }
+  },
+
+  async getInvestments(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId;
+      const investments = await Investment.find({ userId })
+        .sort({ date: -1 }); // Sort by date in descending order
+
+      res.json({
+        status: 'success',
+        data: investments
+      });
+    } catch (error) {
+      console.error('Get investments error:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to fetch investments'
+      });
+    }
+  },
+
+  async getStats(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId;
+      const investments = await Investment.find({ userId });
+
+      const stats = {
+        totalInvested: 0,
+        returns: 0,
+        activeInvestments: 0,
+        projectedReturns: 0
+      };
+
+      investments.forEach(investment => {
+        // Calculate total invested amount
+        stats.totalInvested += investment.amount;
+
+        // Calculate current returns
+        stats.returns += investment.returns;
+
+        // Count active investments
+        if (investment.status === 'active') {
+          stats.activeInvestments += 1;
+        }
+
+        // Calculate projected returns (example: 10% return on active investments)
+        if (investment.status === 'active') {
+          stats.projectedReturns += investment.amount * 0.1;
+        }
+      });
+
+      res.json({
+        status: 'success',
+        data: stats
+      });
+    } catch (error) {
+      console.error('Get investment stats error:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to fetch investment statistics'
       });
     }
   }
