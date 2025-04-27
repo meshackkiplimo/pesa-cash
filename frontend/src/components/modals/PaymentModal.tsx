@@ -42,34 +42,34 @@ const PaymentModal = ({ amount, isOpen, onClose, onSubmit }: PaymentModalProps) 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4">Enter M-Pesa Phone Number</h2>
-        <p className="mb-4">Amount: KES {amount?.toLocaleString()}</p>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-900 p-4 sm:p-6 rounded-xl shadow-xl w-full max-w-md border border-gray-800">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">Enter M-Pesa Phone Number</h2>
+        <p className="mb-4 text-gray-300">Amount: <span className="text-white font-medium">KES {amount?.toLocaleString()}</span></p>
         
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Phone Number
           </label>
           <input
             type="tel"
             placeholder="e.g., 0712345678"
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
           />
-          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
         </div>
 
-        <div className="flex justify-end space-x-4">
+        <div className="flex flex-col-reverse sm:flex-row justify-end space-y-4 space-y-reverse sm:space-y-0 sm:space-x-4">
           <button
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="w-full sm:w-auto px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors text-base font-medium"
             onClick={onClose}
           >
             Cancel
           </button>
           <button
-            className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ${
+            className={`w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity text-base font-medium ${
               isLoading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             onClick={handlePayment}

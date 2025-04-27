@@ -37,24 +37,24 @@ const InvestmentPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Choose Your Investment Amount</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center text-gray-100">Choose Your Investment Amount</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {investmentOptions.map((amount) => (
           <div
             key={amount}
-            className={`p-6 rounded-lg shadow-lg cursor-pointer transition-all duration-300 ${
+            className={`p-4 sm:p-6 rounded-lg shadow-lg cursor-pointer transition-all duration-300 active:scale-95 hover:scale-102 ${
               selectedAmount === amount
-                ? 'bg-blue-500 text-white transform scale-105'
-                : 'bg-white hover:shadow-xl'
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white transform scale-102'
+                : 'bg-gray-800 hover:bg-gray-700'
             }`}
             onClick={() => handleSelect(amount)}
           >
             <div className="text-center">
-              <h2 className="text-2xl font-bold mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-white">
                 KES {amount.toLocaleString()}
               </h2>
-              <p className={`text-sm ${selectedAmount === amount ? 'text-white' : 'text-gray-600'}`}>
+              <p className={`text-sm ${selectedAmount === amount ? 'text-white' : 'text-gray-300'}`}>
                 Click to select this amount
               </p>
             </div>

@@ -26,10 +26,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {activeTab === 'dashboard' ? (
           <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-white mb-8">Welcome to Your Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">Welcome to Your Dashboard</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg p-6 shadow-lg">
                 <h2 className="text-xl font-bold text-white mb-2">Total Investments</h2>
@@ -42,9 +42,9 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-white mb-8">Investment Options</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          <div className="space-y-4 sm:space-y-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">Investment Options</h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {investmentOptions.map((option) => (
                 <div
                   key={option.amount}
@@ -66,8 +66,8 @@ export default function Home() {
             </div>
 
             {selectedAmount && (
-              <div className="mt-8 max-w-md mx-auto bg-black p-6 rounded-lg border border-gray-800">
-                <h2 className="text-2xl font-bold text-white mb-6">Payment Details</h2>
+              <div className="mt-6 sm:mt-8 max-w-md mx-auto bg-black p-4 sm:p-6 rounded-lg border border-gray-800">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Payment Details</h2>
                 <form onSubmit={handlePayment} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -106,7 +106,7 @@ export default function Home() {
                       placeholder="e.g., 254712345678"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                      className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:border-blue-500 focus:outline-none text-base"
                       required
                     />
                   </div>
@@ -119,14 +119,14 @@ export default function Home() {
                       <input
                         type="text"
                         placeholder="Enter MPesa Transaction Code"
-                        className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:border-blue-500 focus:outline-none text-base"
                       />
                     </div>
                   )}
 
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors text-base font-medium"
                   >
                     {paymentMethod === 'stk' ? 'Send STK Push' : 'Verify Payment'}
                   </button>

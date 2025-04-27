@@ -34,8 +34,8 @@ const DashboardPage = () => {
 // Show investment card if loading, error, or no investments
 if (loading || !stats || investments.length === 0) {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Welcome to Your Investment Journey</h1>
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-white">Welcome to Your Investment Journey</h1>
       <div className="max-w-2xl mx-auto">
         <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-xl overflow-hidden">
           <div className="p-8">
@@ -84,39 +84,38 @@ if (loading || !stats || investments.length === 0) {
 }
 
 return (
-  <div className="container mx-auto px-4 py-8">
-    <h1 className="text-3xl font-bold mb-8">Your Investment Dashboard</h1>
+  <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-white">Your Investment Dashboard</h1>
 
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Total Invested Card */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-gray-500 text-sm font-medium mb-2">Total Invested</h3>
-          <p className="text-2xl font-bold text-gray-900">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-5 sm:p-6 border border-gray-700">
+          <h3 className="text-gray-400 text-sm font-medium mb-2">Total Invested</h3>
+          <p className="text-xl sm:text-2xl font-bold text-white">
             KES {stats.totalInvested.toLocaleString()}
           </p>
         </div>
 
         {/* Returns Card */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-gray-500 text-sm font-medium mb-2">Current Returns</h3>
-          <p className="text-2xl font-bold text-green-600">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-5 sm:p-6 border border-gray-700">
+          <h3 className="text-gray-400 text-sm font-medium mb-2">Current Returns</h3>
+          <p className="text-xl sm:text-2xl font-bold text-green-400">
             KES {stats.returns.toLocaleString()}
           </p>
         </div>
 
         {/* Active Investments Card */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-gray-500 text-sm font-medium mb-2">Active Investments</h3>
-          <p className="text-2xl font-bold text-blue-600">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-5 sm:p-6 border border-gray-700">
+          <h3 className="text-gray-400 text-sm font-medium mb-2">Active Investments</h3>
+          <p className="text-xl sm:text-2xl font-bold text-blue-400">
             {stats.activeInvestments}
           </p>
         </div>
 
         {/* Projected Returns Card */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-gray-500 text-sm font-medium mb-2">Projected Returns</h3>
-          <p className="text-2xl font-bold text-purple-600">
+        <div className="bg-gray-800 rounded-lg shadow-lg p-5 sm:p-6 border border-gray-700">
+          <h3 className="text-gray-400 text-sm font-medium mb-2">Projected Returns</h3>
+          <p className="text-xl sm:text-2xl font-bold text-purple-400">
             KES {stats.projectedReturns.toLocaleString()}
           </p>
         </div>
@@ -149,51 +148,53 @@ return (
       {/* Investment History Section */}
       <div>
         <h2 className="text-2xl font-bold mb-6">Investment History</h2>
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Returns
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-700">
+              <thead className="bg-gray-900">
+                <tr>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Returns
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-800 divide-y divide-gray-700">
               {investments.map((investment) => (
                 <tr key={investment.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {new Date(investment.date).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     KES {investment.amount.toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       investment.status === 'active'
-                        ? 'bg-green-100 text-green-800'
+                        ? 'bg-green-900/50 text-green-400'
                         : investment.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-yellow-900/50 text-yellow-400'
+                        : 'bg-gray-900/50 text-gray-400'
                     }`}>
                       {investment.status.charAt(0).toUpperCase() + investment.status.slice(1)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-green-600">
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-green-400">
                     +KES {investment.returns.toLocaleString()}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </div>
