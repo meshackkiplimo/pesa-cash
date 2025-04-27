@@ -26,49 +26,26 @@ const InvestmentPage = () => {
     setShowModal(true);
   };
 
-  // Poll for payment status
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-    
-    if (checkoutRequestId && paymentStatus === 'pending') {
-      intervalId = setInterval(async () => {
-        try {
-          const status = await investmentService.checkPaymentStatus(checkoutRequestId);
-          if (status.ResultCode === 0) {
-            setPaymentStatus('success');
-            setStatusMessage('Payment successful! Redirecting to dashboard...');
-            setTimeout(() => router.push('/dashboard'), 2000);
-          } else if (status.ResultCode === 1032) { // Request cancelled
-            setPaymentStatus('failed');
-            setStatusMessage('Payment cancelled by user.');
-          }
-        } catch (error) {
-          console.error('Failed to check payment status:', error);
-        }
-      }, 5000); // Check every 5 seconds
-    }
 
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [checkoutRequestId, paymentStatus, router]);
+  const handleStatusChange = (newStatus: 'idle' | 'pending' | 'success' | 'failed', message: string) => {
+    setPaymentStatus(newStatus);
+    setStatusMessage(message);
+  };
 
   const handlePayment = async (phoneNumber: string) => {
     try {
-      setPaymentStatus('pending');
-      setStatusMessage('Initiating payment, please check your phone for the STK push...');
+      handleStatusChange('pending', 'Initiating payment, please check your phone for the STK push...');
 
       if (selectedAmount) {
         const response = await investmentService.createInvestment(selectedAmount, phoneNumber);
-        setCheckoutRequestId(response.data.checkoutRequestId);
-        
-        // Keep modal open, show pending state
-        setStatusMessage('Please check your phone and enter M-Pesa PIN to complete payment');
+        handleStatusChange('pending', 'Please check your phone and enter M-Pesa PIN to complete payment');
+        return response;
       }
+      throw new Error('No amount selected');
     } catch (error) {
       console.error('Failed to create investment:', error);
-      setPaymentStatus('failed');
-      setStatusMessage('Failed to initiate payment. Please try again.');
+      handleStatusChange('failed', 'Failed to initiate payment. Please try again.');
+      throw error;
     }
   };
 
@@ -110,6 +87,7 @@ const InvestmentPage = () => {
           }
         }}
         onSubmit={handlePayment}
+        onStatusChange={handleStatusChange}
         status={paymentStatus}
         statusMessage={statusMessage}
       />

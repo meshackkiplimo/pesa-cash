@@ -71,7 +71,7 @@ class MPesaService {
           PartyA: formattedPhone,
           PartyB: config.mpesa.shortcode,
           PhoneNumber: formattedPhone,
-          CallBackURL: `${config.baseUrl}/api/mpesa/callback`,
+          CallBackURL: `${config.baseUrl}/api/investments/mpesa/callback`,
           AccountReference: 'Investment Payment',
           TransactionDesc: 'Investment Payment',
         },

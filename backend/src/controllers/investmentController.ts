@@ -147,11 +147,45 @@ export const investmentController = {
         });
       }
 
-      const status = await mpesaService.checkTransactionStatus(checkoutRequestId);
+      // First check the investment in database
+      const investment = await Investment.findOne({
+        'transactionDetails.checkoutRequestId': checkoutRequestId
+      });
+
+      if (!investment) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Investment not found'
+        });
+      }
+
+      // Check real-time status from Mpesa
+      const mpesaResponse = await mpesaService.checkTransactionStatus(checkoutRequestId);
+
+      // Update investment status based on Mpesa response
+      let status = investment.status;
+      
+      if (Number(mpesaResponse.ResultCode) === 0) {
+        status = 'active';
+      } else{
+        status = 'failed';
+      }
+
+      // Update investment status if it has changed
+      if (status !== investment.status) {
+        await Investment.findByIdAndUpdate(investment._id, {
+          status,
+          'transactionDetails.lastChecked': new Date()
+        });
+      }
 
       res.json({
         status: 'success',
-        data: status
+        data: {
+          status,
+          mpesaStatus: mpesaResponse.ResultDesc,
+          ResultCode: Number(mpesaResponse.ResultCode)
+        }
       });
     } catch (error) {
       console.error('Payment status check error:', error);

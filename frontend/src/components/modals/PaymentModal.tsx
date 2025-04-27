@@ -1,19 +1,77 @@
-import React, { useState } from 'react';
-import { PaymentStatus } from '@/types/investment';
+import React, { useState, useEffect } from 'react';
+import { PaymentStatus, InvestmentResponse } from '@/types/investment';
+import { investmentService } from '@/services/investment';
+import { useRouter } from 'next/navigation';
 
 interface PaymentModalProps {
   amount: number;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (phoneNumber: string) => Promise<void>;
+  onSubmit: (phoneNumber: string) => Promise<InvestmentResponse>;
+  onStatusChange: (status: PaymentStatus, message: string) => void;
   status: PaymentStatus;
   statusMessage: string;
 }
 
-const PaymentModal = ({ amount, isOpen, onClose, onSubmit, status, statusMessage }: PaymentModalProps) => {
+const PaymentModal = ({
+  amount,
+  isOpen,
+  onClose,
+  onSubmit,
+  onStatusChange,
+  status,
+  statusMessage
+}: PaymentModalProps) => {
+  const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
+  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [pollingInterval]);
+
+  const startPolling = (checkoutId: string) => {
+    // Clear any existing polling
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+    }
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await investmentService.checkPaymentStatus(checkoutId);
+        const { status: paymentStatus, ResultCode } = response.data;
+        
+        if (ResultCode === 0 || paymentStatus === 'active') {
+          // Payment successful
+          clearInterval(interval);
+          setIsLoading(false);
+          setError('');
+          onStatusChange('success', 'Payment successful! Redirecting to dashboard...');
+          setTimeout(() => {
+            onClose();
+            router.push('/dashboard');
+          }, 2000);
+        } else if (ResultCode === 1 || paymentStatus === 'failed') {
+          // Payment failed
+          clearInterval(interval);
+          onStatusChange('failed', 'Payment was cancelled or failed');
+          setIsLoading(false);
+        }
+        // Continue polling if pending
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+      }
+    }, 5000); // Poll every 5 seconds
+
+    setPollingInterval(interval);
+  };
 
   const handlePayment = async () => {
     // Basic phone number validation for Kenya
@@ -26,11 +84,14 @@ const PaymentModal = ({ amount, isOpen, onClose, onSubmit, status, statusMessage
     setError('');
 
     try {
-      await onSubmit(`254${phoneNumber}`);
+      const { data } = await onSubmit(`254${phoneNumber}`);
+      if (data.checkoutRequestId) {
+        setCheckoutRequestId(data.checkoutRequestId);
+        startPolling(data.checkoutRequestId);
+      }
     } catch (error) {
       console.error('Failed to process payment:', error);
       setError('Failed to process payment. Please try again.');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -55,7 +116,9 @@ const PaymentModal = ({ amount, isOpen, onClose, onSubmit, status, statusMessage
           </div>
         )}
         
-        <div className="mb-6">
+        {/* Hide input when payment is pending */}
+        {status !== 'pending' && (
+          <div className="mb-6">
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Phone Number
           </label>
@@ -75,9 +138,18 @@ const PaymentModal = ({ amount, isOpen, onClose, onSubmit, status, statusMessage
             Enter your phone number without 0 or +254 prefix
           </p>
           {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
-        </div>
+          </div>
+        )}
 
-        {status !== 'pending' && (
+        {/* Show loading state during payment processing */}
+        {isLoading && status === 'pending' && (
+          <div className="flex items-center justify-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <span className="ml-3 text-blue-400">Processing payment...</span>
+          </div>
+        )}
+
+        {!isLoading && status !== 'pending' && (
           <div className="flex flex-col-reverse sm:flex-row justify-end space-y-4 space-y-reverse sm:space-y-0 sm:space-x-4">
             <button
               className="w-full sm:w-auto px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors text-base font-medium"

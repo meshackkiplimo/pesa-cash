@@ -17,9 +17,14 @@ connectDB();
 
 // Security Middleware
 app.use(helmet()); // Adds various HTTP headers for security
+// Allow CORS for frontend and M-Pesa
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourfrontenddomain.com'] // Replace with your frontend domain
+  origin: process.env.NODE_ENV === 'production'
+    ? [
+        'https://yourfrontenddomain.com', // Replace with your frontend domain
+        'https://api.safaricom.co.ke',    // M-Pesa production
+        'https://sandbox.safaricom.co.ke'  // M-Pesa sandbox
+      ]
     : true,
   credentials: true
 }));
