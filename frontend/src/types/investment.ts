@@ -1,10 +1,31 @@
+export type PaymentStatus = 'idle' | 'pending' | 'success' | 'failed';
+
+export interface TransactionDetails {
+  checkoutRequestId?: string;
+  merchantRequestId?: string;
+  mpesaReceiptNumber?: string;
+  phoneNumber?: string;
+  transactionDate?: string;
+}
+
 export interface Investment {
-  id: string;
+  _id: string;
   userId: string;
   amount: number;
   date: string;
-  status: 'active' | 'completed' | 'pending';
+  status: 'active' | 'completed' | 'pending' | 'failed';
   returns: number;
+  transactionDetails?: TransactionDetails;
+}
+
+export interface InvestmentResponse {
+  status: 'success' | 'error';
+  message: string;
+  data: {
+    investmentId: string;
+    checkoutRequestId: string;
+    merchantRequestId: string;
+  };
 }
 
 export interface InvestmentStats {
@@ -12,4 +33,13 @@ export interface InvestmentStats {
   returns: number;
   activeInvestments: number;
   projectedReturns: number;
+}
+
+export interface PaymentStatusResponse {
+  status: 'success' | 'error';
+  data: {
+    ResultCode: number;
+    ResultDesc: string;
+    [key: string]: any;
+  };
 }

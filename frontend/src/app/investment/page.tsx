@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { investmentService } from '@/services/investment';
 import { useRouter } from 'next/navigation';
 import PaymentModal from '@/components/modals/PaymentModal';
@@ -9,7 +9,9 @@ const InvestmentPage = () => {
   const router = useRouter();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
-  
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
+  const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState('');
   const investmentOptions = [
     100000,
     150000,
@@ -24,16 +26,49 @@ const InvestmentPage = () => {
     setShowModal(true);
   };
 
+  // Poll for payment status
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    
+    if (checkoutRequestId && paymentStatus === 'pending') {
+      intervalId = setInterval(async () => {
+        try {
+          const status = await investmentService.checkPaymentStatus(checkoutRequestId);
+          if (status.ResultCode === 0) {
+            setPaymentStatus('success');
+            setStatusMessage('Payment successful! Redirecting to dashboard...');
+            setTimeout(() => router.push('/dashboard'), 2000);
+          } else if (status.ResultCode === 1032) { // Request cancelled
+            setPaymentStatus('failed');
+            setStatusMessage('Payment cancelled by user.');
+          }
+        } catch (error) {
+          console.error('Failed to check payment status:', error);
+        }
+      }, 5000); // Check every 5 seconds
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [checkoutRequestId, paymentStatus, router]);
+
   const handlePayment = async (phoneNumber: string) => {
     try {
+      setPaymentStatus('pending');
+      setStatusMessage('Initiating payment, please check your phone for the STK push...');
+
       if (selectedAmount) {
-        await investmentService.createInvestment(selectedAmount, phoneNumber);
-        setShowModal(false);
-        router.push('/dashboard');
+        const response = await investmentService.createInvestment(selectedAmount, phoneNumber);
+        setCheckoutRequestId(response.data.checkoutRequestId);
+        
+        // Keep modal open, show pending state
+        setStatusMessage('Please check your phone and enter M-Pesa PIN to complete payment');
       }
     } catch (error) {
       console.error('Failed to create investment:', error);
-      throw error; // This will be handled by the modal component
+      setPaymentStatus('failed');
+      setStatusMessage('Failed to initiate payment. Please try again.');
     }
   };
 
@@ -63,11 +98,20 @@ const InvestmentPage = () => {
         ))}
       </div>
 
-      <PaymentModal 
+      <PaymentModal
         amount={selectedAmount || 0}
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          if (paymentStatus !== 'pending') {
+            setShowModal(false);
+            setPaymentStatus('idle');
+            setStatusMessage('');
+            setCheckoutRequestId(null);
+          }
+        }}
         onSubmit={handlePayment}
+        status={paymentStatus}
+        statusMessage={statusMessage}
       />
     </div>
   );

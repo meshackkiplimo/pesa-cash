@@ -4,8 +4,15 @@ export interface IInvestment extends Document {
   userId: mongoose.Types.ObjectId;
   amount: number;
   date: Date;
-  status: 'active' | 'completed' | 'pending';
+  status: 'active' | 'completed' | 'pending' | 'failed';
   returns: number;
+  transactionDetails?: {
+    checkoutRequestId?: string;
+    merchantRequestId?: string;
+    mpesaReceiptNumber?: string;
+    phoneNumber?: string;
+    transactionDate?: Date;
+  };
 }
 
 const investmentSchema = new Schema({
@@ -25,12 +32,19 @@ const investmentSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['active', 'completed', 'pending'],
+    enum: ['active', 'completed', 'pending', 'failed'],
     default: 'pending'
   },
   returns: {
     type: Number,
     default: 0
+  },
+  transactionDetails: {
+    checkoutRequestId: String,
+    merchantRequestId: String,
+    mpesaReceiptNumber: String,
+    phoneNumber: String,
+    transactionDate: Date
   }
 }, {
   timestamps: true

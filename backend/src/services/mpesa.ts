@@ -14,8 +14,12 @@ class MPesaService {
     const auth = Buffer.from(`${config.mpesa.consumerKey}:${config.mpesa.consumerSecret}`).toString('base64');
     
     try {
+      const baseUrl = config.mpesa.environment === 'production'
+        ? 'https://api.safaricom.co.ke'
+        : 'https://sandbox.safaricom.co.ke';
+
       const response = await axios.get(
-        'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
+        `${baseUrl}/oauth/v1/generate?grant_type=client_credentials`,
         {
           headers: {
             Authorization: `Basic ${auth}`,
@@ -47,17 +51,26 @@ class MPesaService {
         `${config.mpesa.shortcode}${config.mpesa.passkey}${timestamp}`
       ).toString('base64');
 
+      const baseUrl = config.mpesa.environment === 'production'
+        ? 'https://api.safaricom.co.ke'
+        : 'https://sandbox.safaricom.co.ke';
+
+      // Ensure phone number starts with 254
+      const formattedPhone = phoneNumber
+        .replace(/^\+/, '')  // Remove leading + if present
+        .replace(/^0/, '254'); // Replace leading 0 with 254
+
       const response = await axios.post(
-        'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
+        `${baseUrl}/mpesa/stkpush/v1/processrequest`,
         {
           BusinessShortCode: config.mpesa.shortcode,
           Password: password,
           Timestamp: timestamp,
           TransactionType: 'CustomerPayBillOnline',
           Amount: amount,
-          PartyA: phoneNumber.replace('+', ''),
+          PartyA: formattedPhone,
           PartyB: config.mpesa.shortcode,
-          PhoneNumber: phoneNumber.replace('+', ''),
+          PhoneNumber: formattedPhone,
           CallBackURL: `${config.baseUrl}/api/mpesa/callback`,
           AccountReference: 'Investment Payment',
           TransactionDesc: 'Investment Payment',
@@ -85,8 +98,12 @@ class MPesaService {
         `${config.mpesa.shortcode}${config.mpesa.passkey}${timestamp}`
       ).toString('base64');
 
+      const baseUrl = config.mpesa.environment === 'production'
+        ? 'https://api.safaricom.co.ke'
+        : 'https://sandbox.safaricom.co.ke';
+
       const response = await axios.post(
-        'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query',
+        `${baseUrl}/mpesa/stkpushquery/v1/query`,
         {
           BusinessShortCode: config.mpesa.shortcode,
           Password: password,

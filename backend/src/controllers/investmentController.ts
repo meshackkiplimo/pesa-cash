@@ -10,9 +10,10 @@ interface InvestmentRequest {
 }
 
 export const investmentController = {
-  async createInvestment(req: Request, res: Response) {
+  async createInvestment(req: AuthRequest, res: Response) {
     try {
       const { amount, phoneNumber }: InvestmentRequest = req.body;
+      const userId = req.user?.userId;
 
       // Validate request
       if (!amount || !phoneNumber) {
@@ -22,20 +23,41 @@ export const investmentController = {
         });
       }
 
+      // Create a pending investment
+      const investment = new Investment({
+        userId,
+        amount,
+        status: 'pending',
+        transactionDetails: {
+          phoneNumber
+        }
+      });
+      await investment.save();
+
       // Initiate STK Push
       const stkPushResponse = await mpesaService.initiateSTKPush(phoneNumber, amount);
-
-      // Store the checkout request ID for later verification
-
       
-      // You might want to store this in your database along with the investment details
-      const checkoutRequestId = stkPushResponse.CheckoutRequestID;
+      console.log('M-Pesa STK Push Response:', JSON.stringify(stkPushResponse, null, 2));
+
+      if (!stkPushResponse.CheckoutRequestID || !stkPushResponse.MerchantRequestID) {
+        console.error('Invalid M-Pesa response:', stkPushResponse);
+        throw new Error('Invalid M-Pesa response');
+      }
+
+      // Update investment with transaction details
+      investment.transactionDetails = {
+        ...investment.transactionDetails,
+        checkoutRequestId: stkPushResponse.CheckoutRequestID,
+        merchantRequestId: stkPushResponse.MerchantRequestID,
+      };
+      await investment.save();
 
       res.status(200).json({
         status: 'success',
         message: 'Payment initiated',
         data: {
-          checkoutRequestId,
+          investmentId: investment._id,
+          checkoutRequestId: stkPushResponse.CheckoutRequestID,
           merchantRequestId: stkPushResponse.MerchantRequestID
         }
       });
@@ -52,13 +74,41 @@ export const investmentController = {
   async mpesaCallback(req: Request, res: Response) {
     try {
       const { Body } = req.body;
+      const { stkCallback } = Body;
 
-      if (Body.stkCallback.ResultCode === 0) {
+      // Find investment by CheckoutRequestID
+      const investment = await Investment.findOne({
+        'transactionDetails.checkoutRequestId': stkCallback.CheckoutRequestID
+      });
+
+      if (!investment) {
+        console.error('Investment not found for checkout request ID:', stkCallback.CheckoutRequestID);
+        return res.status(404).json({
+          status: 'error',
+          message: 'Investment not found'
+        });
+      }
+
+      if (stkCallback.ResultCode === 0) {
         // Payment successful
-        // Here you would typically:
-        // 1. Update the investment status in your database
-        // 2. Send notification to the user
-        // 3. Update any relevant statistics
+        console.log('M-Pesa Callback Data:', JSON.stringify(stkCallback, null, 2));
+
+        // Extract M-Pesa receipt number from callback metadata
+        const mpesaReceiptNumber = stkCallback.CallbackMetadata?.Item?.find(
+          (item: any) => item.Name === 'MpesaReceiptNumber'
+        )?.Value;
+
+        if (!mpesaReceiptNumber) {
+          console.error('M-Pesa receipt number not found in callback data');
+        }
+
+        investment.status = 'active';
+        investment.transactionDetails = {
+          ...investment.transactionDetails,
+          mpesaReceiptNumber: mpesaReceiptNumber || 'NOT_PROVIDED',
+          transactionDate: new Date()
+        };
+        await investment.save();
 
         // Send acknowledgment to Safaricom
         res.json({
@@ -67,10 +117,13 @@ export const investmentController = {
         });
       } else {
         // Payment failed
-        console.error('Payment failed:', Body.stkCallback.ResultDesc);
+        investment.status = 'failed';
+        await investment.save();
+
+        console.error('Payment failed:', stkCallback.ResultDesc);
         res.json({
           status: 'error',
-          message: Body.stkCallback.ResultDesc
+          message: stkCallback.ResultDesc
         });
       }
     } catch (error) {

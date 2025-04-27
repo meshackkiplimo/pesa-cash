@@ -169,7 +169,7 @@ return (
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
               {investments.map((investment) => (
-                <tr key={investment.id}>
+                <tr key={investment._id}>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {new Date(investment.date).toLocaleDateString()}
                   </td>

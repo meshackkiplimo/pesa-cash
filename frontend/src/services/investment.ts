@@ -1,45 +1,69 @@
-import { Investment, InvestmentStats } from '@/types/investment';
+import { Investment, InvestmentStats, InvestmentResponse } from '@/types/investment';
 import { API_URL } from '@/config';
+import Cookies from 'js-cookie';
 
-export const investmentService = {
-  async createInvestment(amount: number, phoneNumber: string): Promise<Investment> {
+class InvestmentService {
+  private getHeaders(): HeadersInit {
+    const token = Cookies.get('token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+  }
+
+  async createInvestment(amount: number, phoneNumber: string): Promise<InvestmentResponse> {
     const response = await fetch(`${API_URL}/investments`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
+      headers: this.getHeaders(),
       body: JSON.stringify({ amount, phoneNumber }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create investment');
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create investment');
     }
 
     return response.json();
-  },
+  }
 
   async getInvestments(): Promise<Investment[]> {
     const response = await fetch(`${API_URL}/investments`, {
-      credentials: 'include',
+      headers: this.getHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch investments');
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch investments');
     }
 
     return response.json();
-  },
+  }
 
   async getStats(): Promise<InvestmentStats> {
     const response = await fetch(`${API_URL}/investments/stats`, {
-      credentials: 'include',
+      headers: this.getHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch investment stats');
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch investment stats');
     }
 
     return response.json();
-  },
-};
+  }
+
+  async checkPaymentStatus(checkoutRequestId: string): Promise<any> {
+    const response = await fetch(`${API_URL}/investments/payment-status/${checkoutRequestId}`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to check payment status');
+    }
+
+    return response.json();
+  }
+}
+
+export const investmentService = new InvestmentService();
