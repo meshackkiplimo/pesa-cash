@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { Request } from 'express';
+import { AuthRequest } from '../middleware/auth';
 import { mpesaService } from '../services/mpesa';
-
 import { Investment } from '../models/Investment';
 
 interface InvestmentRequest {
@@ -106,7 +107,7 @@ export const investmentController = {
     }
   },
 
-  async getInvestments(req: Request, res: Response) {
+  async getInvestments(req: AuthRequest, res: Response) {
     try {
       const userId = req.user?.userId;
       const investments = await Investment.find({ userId })
@@ -125,7 +126,7 @@ export const investmentController = {
     }
   },
 
-  async getStats(req: Request, res: Response) {
+  async getStats(req: AuthRequest, res: Response) {
     try {
       const userId = req.user?.userId;
       const investments = await Investment.find({ userId });

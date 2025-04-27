@@ -8,7 +8,7 @@ class MPesaService {
   private async getAccessToken(): Promise<string> {
     // Return existing token if still valid
     if (this.token && this.tokenExpiry && this.tokenExpiry > new Date()) {
-      return this.token;
+      return this.token as string; // We know it's valid here
     }
 
     const auth = Buffer.from(`${config.mpesa.consumerKey}:${config.mpesa.consumerSecret}`).toString('base64');
@@ -23,11 +23,16 @@ class MPesaService {
         }
       );
 
-      this.token = response.data.access_token;
+      const token = response.data.access_token;
+      if (!token) {
+        throw new Error('Received empty token from MPesa');
+      }
+      
+      this.token = token;
       // Token expires in 1 hour
       this.tokenExpiry = new Date(Date.now() + 3600000);
       
-      return this.token;
+      return token;
     } catch (error) {
       console.error('Failed to get MPesa access token:', error);
       throw new Error('Failed to get MPesa access token');
