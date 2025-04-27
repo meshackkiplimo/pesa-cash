@@ -26,6 +26,8 @@ export const investmentController = {
       const stkPushResponse = await mpesaService.initiateSTKPush(phoneNumber, amount);
 
       // Store the checkout request ID for later verification
+
+      
       // You might want to store this in your database along with the investment details
       const checkoutRequestId = stkPushResponse.CheckoutRequestID;
 

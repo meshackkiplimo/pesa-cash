@@ -15,7 +15,8 @@ const InvestmentPage = () => {
     150000,
     200000,
     250000,
-    300000
+    300000,
+    1,
   ];
 
   const handleSelect = (amount: number) => {
