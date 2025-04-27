@@ -1,35 +1,37 @@
 import dotenv from 'dotenv';
-import path from 'path';
 
-// Load environment variables
 dotenv.config();
 
 interface Config {
   port: number;
+  nodeEnv: string;
   mongoUri: string;
   jwtSecret: string;
-  nodeEnv: string;
   rateLimitWindowMs: number;
   rateLimitMax: number;
+  baseUrl: string;
+  mpesa: {
+    consumerKey: string;
+    consumerSecret: string;
+    shortcode: string;
+    passkey: string;
+    environment: 'sandbox' | 'production';
+  };
 }
 
 export const config: Config = {
-  port: parseInt(process.env.PORT || '5000', 10),
-  mongoUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/pesa_db',
-  jwtSecret: process.env.JWT_SECRET || 'fallback_secret_do_not_use_in_production',
+  port: Number(process.env.PORT) || 5000,
   nodeEnv: process.env.NODE_ENV || 'development',
-  rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10),
-  rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
+  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/pesa',
+  jwtSecret: process.env.JWT_SECRET || 'your-secret-key',
+  rateLimitWindowMs: 15 * 60 * 1000, // 15 minutes
+  rateLimitMax: 100, // limit each IP to 100 requests per windowMs
+  baseUrl: process.env.BASE_URL || 'http://localhost:5000',
+  mpesa: {
+    consumerKey: process.env.MPESA_CONSUMER_KEY || '',
+    consumerSecret: process.env.MPESA_CONSUMER_SECRET || '',
+    shortcode: process.env.MPESA_SHORTCODE || '',
+    passkey: process.env.MPESA_PASSKEY || '',
+    environment: (process.env.MPESA_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production'
+  }
 };
-
-// Ensure required environment variables are set
-const requiredEnvVars = ['JWT_SECRET'];
-if (config.nodeEnv === 'production') {
-  requiredEnvVars.forEach((envVar) => {
-    if (!process.env[envVar]) {
-      throw new Error(`Environment variable ${envVar} is required in production`);
-    }
-  });
-}
-
-export default config;

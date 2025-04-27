@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { investmentService } from '@/services/investment';
 import { useRouter } from 'next/navigation';
+import PaymentModal from '@/components/modals/PaymentModal';
 
 const InvestmentPage = () => {
   const router = useRouter();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [showModal, setShowModal] = useState(false);
   
   const investmentOptions = [
     100000,
@@ -18,6 +20,20 @@ const InvestmentPage = () => {
 
   const handleSelect = (amount: number) => {
     setSelectedAmount(amount);
+    setShowModal(true);
+  };
+
+  const handlePayment = async (phoneNumber: string) => {
+    try {
+      if (selectedAmount) {
+        await investmentService.createInvestment(selectedAmount, phoneNumber);
+        setShowModal(false);
+        router.push('/dashboard');
+      }
+    } catch (error) {
+      console.error('Failed to create investment:', error);
+      throw error; // This will be handled by the modal component
+    }
   };
 
   return (
@@ -45,27 +61,13 @@ const InvestmentPage = () => {
           </div>
         ))}
       </div>
-      
-      {selectedAmount && (
-        <div className="mt-8 text-center">
-          <button
-            className="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 transition-colors"
-            onClick={async () => {
-              try {
-                if (selectedAmount) {
-                  await investmentService.createInvestment(selectedAmount);
-                  router.push('/dashboard');
-                }
-              } catch (error) {
-                console.error('Failed to create investment:', error);
-                // You might want to add proper error handling here
-              }
-            }}
-          >
-            Invest KES {selectedAmount.toLocaleString()}
-          </button>
-        </div>
-      )}
+
+      <PaymentModal 
+        amount={selectedAmount || 0}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSubmit={handlePayment}
+      />
     </div>
   );
 };

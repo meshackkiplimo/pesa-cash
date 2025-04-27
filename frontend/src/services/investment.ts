@@ -2,14 +2,14 @@ import { Investment, InvestmentStats } from '@/types/investment';
 import { API_URL } from '@/config';
 
 export const investmentService = {
-  async createInvestment(amount: number): Promise<Investment> {
+  async createInvestment(amount: number, phoneNumber: string): Promise<Investment> {
     const response = await fetch(`${API_URL}/investments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify({ amount }),
+      body: JSON.stringify({ amount, phoneNumber }),
     });
 
     if (!response.ok) {

@@ -7,6 +7,7 @@ import { config } from './config';
 import { connectDB } from './config/database';
 import { errorHandler, notFound } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
+import investmentRoutes from './routes/investment';
 
 // Initialize express app
 const app: Express = express();
@@ -41,6 +42,7 @@ if (config.nodeEnv === 'development') {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/investments', investmentRoutes);
 
 // Error Handling
 app.use(notFound);
