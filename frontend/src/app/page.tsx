@@ -1,12 +1,11 @@
 "use client";
 import { useState } from 'react';
-import Link from 'next/link';
 
 export default function Home() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('stk');
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab] = useState('dashboard');
 
   const investmentOptions = [
     { amount: 10000, label: '10K Investment', returns: '12% yearly', color: 'from-blue-500 to-blue-700' },

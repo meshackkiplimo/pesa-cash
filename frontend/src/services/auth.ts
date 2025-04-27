@@ -1,4 +1,8 @@
 import { SignUpData, SignInData, AuthResponse, User } from '@/types/auth';
+
+interface ValidationError {
+  msg: string;
+}
 import { API_URL } from '@/config';
 import Cookies from 'js-cookie';
 
@@ -37,7 +41,7 @@ class AuthService {
       if (errorData.error && errorData.error.errors) {
         // Handle validation errors
         const validationErrors = errorData.error.errors
-          .map((err: any) => err.msg)
+          .map((err: ValidationError) => err.msg)
           .join(', ');
         throw new Error(validationErrors);
       }
