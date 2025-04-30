@@ -79,6 +79,13 @@ export default function Navbar() {
                 </button>
                 <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-gray-900 ring-1 ring-black ring-opacity-5 transform opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out origin-top-right">
                   <div className="py-1" role="menu">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150"
+                      role="menuitem"
+                    >
+                      Profile
+                    </Link>
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150"
@@ -120,13 +127,22 @@ export default function Navbar() {
             Dashboard
           </Link>
           {isAuthenticated && (
-            <Link
-              href="/investment"
-              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Investment
-            </Link>
+            <>
+              <Link
+                href="/investment"
+                className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Investment
+              </Link>
+              <Link
+                href="/profile"
+                className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Profile
+              </Link>
+            </>
           )}
           {!isAuthenticated && (
             <>
