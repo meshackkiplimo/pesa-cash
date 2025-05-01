@@ -72,8 +72,13 @@ export default function SignIn() {
           </div>
         )}
         {error && (
-          <div className="bg-red-900/50 border border-red-600 text-red-400 px-4 py-3 rounded-lg relative" role="alert">
+          <div className="bg-red-900/50 border border-red-600 text-red-400 px-4 py-3 rounded-lg relative space-y-2" role="alert">
             <span className="block sm:inline text-sm">{error}</span>
+            {error.includes('password') && (
+              <Link href="/forgot-password" className="block text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                Click here to reset your password
+              </Link>
+            )}
           </div>
         )}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
