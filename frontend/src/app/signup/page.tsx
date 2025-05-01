@@ -14,6 +14,19 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Password validation states
+  const [hasLength, setHasLength] = useState(false);
+  const [hasNumber, setHasNumber] = useState(false);
+  const [hasCapital, setHasCapital] = useState(false);
+  const [hasSymbol, setHasSymbol] = useState(false);
+
+  const validatePassword = (value: string) => {
+    setHasLength(value.length >= 8);
+    setHasNumber(/[0-9]/.test(value));
+    setHasCapital(/[A-Z]/.test(value));
+    setHasSymbol(/[!@#$%^&*(),.?":{}|<>]/.test(value));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,9 +38,9 @@ export default function SignUp() {
       return;
     }
 
-    // Validate password length
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    // Validate all password requirements
+    if (!hasLength || !hasNumber || !hasCapital || !hasSymbol) {
+      setError('Please meet all password requirements');
       return;
     }
 
@@ -127,7 +140,10 @@ export default function SignUp() {
                 className="appearance-none rounded-none relative block w-full px-4 py-3 border border-gray-600 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:z-10 text-base"
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  validatePassword(e.target.value);
+                }}
               />
             </div>
             <div>
@@ -144,6 +160,34 @@ export default function SignUp() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
+            </div>
+          </div>
+
+          {/* Password requirements */}
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center space-x-2">
+              <div className={`w-2 h-2 rounded-full ${hasLength ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span className={hasLength ? 'text-green-500' : 'text-red-500'}>
+                At least 8 characters long
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={`w-2 h-2 rounded-full ${hasNumber ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span className={hasNumber ? 'text-green-500' : 'text-red-500'}>
+                Contains a number
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={`w-2 h-2 rounded-full ${hasCapital ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span className={hasCapital ? 'text-green-500' : 'text-red-500'}>
+                Contains a capital letter
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className={`w-2 h-2 rounded-full ${hasSymbol ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span className={hasSymbol ? 'text-green-500' : 'text-red-500'}>
+                Contains a symbol (!@#$%^&*(),.?&quot;:{}|&lt;&gt;)
+              </span>
             </div>
           </div>
 
