@@ -10,6 +10,11 @@ interface Config {
   rateLimitWindowMs: number;
   rateLimitMax: number;
   baseUrl: string;
+  emailHost: string;
+  emailPort: number;
+  emailUser: string;
+  emailPass: string;
+  emailFrom: string;
   mpesa: {
     consumerKey: string;
     consumerSecret: string;
@@ -27,6 +32,11 @@ export const config: Config = {
   rateLimitWindowMs: 15 * 60 * 1000, // 15 minutes
   rateLimitMax: 100, // limit each IP to 100 requests per windowMs
   baseUrl: process.env.BASE_URL || 'http://localhost:5000',
+  emailHost: process.env.EMAIL_HOST || 'smtp.gmail.com',
+  emailPort: Number(process.env.EMAIL_PORT) || 587,
+  emailUser: process.env.EMAIL_USER || '',
+  emailPass: process.env.EMAIL_PASS || '',
+  emailFrom: process.env.EMAIL_FROM || 'noreply@pesacash.com',
   mpesa: {
     consumerKey: process.env.MPESA_CONSUMER_KEY || '',
     consumerSecret: process.env.MPESA_CONSUMER_SECRET || '',

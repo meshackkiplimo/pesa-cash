@@ -28,3 +28,24 @@ export interface AuthResponse {
   user: User;
   token: string;
 }
+
+
+export interface ResetPasswordData {
+  password: string;
+}
+export interface ResetPasswordResponse {
+  message: string;
+  token: string;
+}
+export interface ForgotPasswordData {
+  email: string;
+}
+export interface ForgotPasswordResponse {
+  message: string;
+  token: string;
+}
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}

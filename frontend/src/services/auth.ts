@@ -1,4 +1,4 @@
-import { SignUpData, SignInData, AuthResponse, User } from '@/types/auth';
+import { SignUpData, SignInData, AuthResponse, User, ForgotPasswordData, ResetPasswordData, ForgotPasswordResponse, ResetPasswordResponse } from '@/types/auth';
 
 interface ValidationError {
   msg: string;
@@ -107,6 +107,28 @@ class AuthService {
         newPassword
       }),
     });
+  }
+
+  async forgotPassword(data: ForgotPasswordData): Promise<ForgotPasswordResponse> {
+    const response = await this.request('/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response;
+  }
+
+  async resetPassword(token: string, data: ResetPasswordData): Promise<ResetPasswordResponse> {
+    const response = await this.request(`/reset-password/${token}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+
+    if (response.data && response.data.token) {
+      this.token = response.data.token;
+      Cookies.set('token', response.data.token, { expires: 7 });
+    }
+
+    return response;
   }
 }
 

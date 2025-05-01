@@ -11,6 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@types/nodemailer": "^6.4.17",
     "axios": "^1.9.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -21,7 +22,8 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.3",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.10.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

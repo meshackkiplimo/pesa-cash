@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
+import crypto from 'crypto';
 
 export interface IUser extends Document {
   email: string;
@@ -11,8 +12,11 @@ export interface IUser extends Document {
   role: 'user' | 'admin';
   isActive: boolean;
   lastLogin?: Date;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
   generateAuthToken(): string;
+  generateResetPasswordToken(): string;
 }
 
 const userSchema = new Schema({
@@ -51,7 +55,9 @@ const userSchema = new Schema({
   },
   lastLogin: {
     type: Date
-  }
+  },
+  resetPasswordToken: String,
+  resetPasswordExpire: Date
 }, {
   timestamps: true
 });
@@ -86,6 +92,21 @@ userSchema.set('toJSON', {
     return ret;
   }
 });
+
+// Generate password reset token
+userSchema.methods.generateResetPasswordToken = function(): string {
+  // Generate random bytes for the reset token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+  
+  // Hash the reset token
+  const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  
+  // Save the hashed token and expiry
+  this.resetPasswordToken = hashedToken;
+  this.resetPasswordExpire = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+  return resetToken;
+};
 
 export const User = mongoose.model<IUser>('User', userSchema);
 

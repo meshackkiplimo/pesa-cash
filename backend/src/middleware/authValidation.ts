@@ -18,3 +18,17 @@ export const loginValidation = [
   body('password').notEmpty().withMessage('Password is required'),
   validateRequest
 ];
+
+export const forgotPasswordValidation = [
+  body('email').isEmail().withMessage('Enter a valid email'),
+  validateRequest
+];
+
+export const resetPasswordValidation = [
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters')
+    .matches(/\d/)
+    .withMessage('Password must contain a number'),
+  validateRequest
+];
