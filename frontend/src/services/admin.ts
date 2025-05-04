@@ -1,6 +1,7 @@
 import { User } from '@/types/auth';
 
-const BASE_URL = '/api/admin';
+import { API_URL } from '@/config';
+const BASE_URL = `${API_URL}/admin`;
 
 export const adminService = {
   async getUsers(): Promise<User[]> {
