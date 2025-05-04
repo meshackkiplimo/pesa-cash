@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { User } from '../models/User';
+import { Investment } from '../models/Investment';
 
 export const adminController = {
   // Get all users
@@ -77,6 +78,16 @@ export const adminController = {
       res.json(user);
     } catch (error) {
       res.status(500).json({ message: 'Error fetching user details' });
+    }
+  },
+
+  // Get all investments
+  async getInvestments(req: Request, res: Response) {
+    try {
+      const investments = await Investment.find().populate('userId', 'name email');
+      res.json(investments);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching investments' });
     }
   }
 };

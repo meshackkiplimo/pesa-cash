@@ -62,10 +62,9 @@ export default function AdminPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-8">User Management</h1>
       
-      <div className="bg-white shadow rounded-lg p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">User Management</h2>
+      <div className="bg-white shadow rounded-lg p-6">
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto">
             <thead className="bg-gray-50">
@@ -122,6 +121,7 @@ export default function AdminPage() {
           </table>
         </div>
       </div>
+
     </div>
   );
 }

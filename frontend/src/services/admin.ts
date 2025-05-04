@@ -1,4 +1,5 @@
 import { User } from '@/types/auth';
+import { Investment } from '@/types/investment';
 
 import { API_URL } from '@/config';
 const BASE_URL = `${API_URL}/admin`;
@@ -48,6 +49,21 @@ export const adminService = {
 
     if (!response.ok) {
       throw new Error('Failed to update user role');
+    }
+
+    return response.json();
+  },
+
+  async getInvestments(): Promise<Investment[]> {
+    const response = await fetch(`${BASE_URL}/investments`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch investments');
     }
 
     return response.json();

@@ -8,9 +8,15 @@ export interface TransactionDetails {
   transactionDate?: string;
 }
 
+export interface PopulatedUser {
+  _id: string;
+  name: string;
+  email: string;
+}
+
 export interface Investment {
   _id: string;
-  userId: string;
+  userId: string | PopulatedUser;
   amount: number;
   date: string;
   status: 'active' | 'completed' | 'pending' | 'failed';
