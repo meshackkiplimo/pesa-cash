@@ -32,12 +32,22 @@ export default function Navbar() {
                 Dashboard
               </Link>
               {isAuthenticated && (
-                <Link
-                  href="/investment"
-                  className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
-                >
-                  Investment
-                </Link>
+                <>
+                  <Link
+                    href="/investment"
+                    className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
+                  >
+                    Investment
+                  </Link>
+                  {user?.role === 'admin' && (
+                    <Link
+                      href="/admin"
+                      className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
+                    >
+                      Admin
+                    </Link>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -135,6 +145,15 @@ export default function Navbar() {
               >
                 Investment
               </Link>
+              {user?.role === 'admin' && (
+                <Link
+                  href="/admin"
+                  className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin
+                </Link>
+              )}
               <Link
                 href="/profile"
                 className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"

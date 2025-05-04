@@ -3,6 +3,8 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
+  role: 'user' | 'admin';
+  isActive: boolean;
 }
 
 export interface AuthState {

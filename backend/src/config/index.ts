@@ -22,6 +22,12 @@ interface Config {
     passkey: string;
     environment: 'sandbox' | 'production';
   };
+  admin: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  };
 }
 
 export const config: Config = {
@@ -43,5 +49,11 @@ export const config: Config = {
     shortcode: process.env.MPESA_SHORTCODE || '',
     passkey: process.env.MPESA_PASSKEY || '',
     environment: (process.env.MPESA_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production'
+  },
+  admin: {
+    email: process.env.ADMIN_EMAIL || 'admin@investpro.com',
+    password: process.env.ADMIN_PASSWORD || 'Admin@123',
+    firstName: process.env.ADMIN_FIRST_NAME || 'Admin',
+    lastName: process.env.ADMIN_LAST_NAME || 'User'
   }
 };

@@ -5,15 +5,19 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { config } from './config';
 import { connectDB } from './config/database';
+import { setupAdminUser } from './config/setupAdmin';
 import { errorHandler, notFound } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
 import investmentRoutes from './routes/investment';
+import adminRoutes from './routes/admin';
 
 // Initialize express app
 const app: Express = express();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB and setup admin user
+connectDB().then(() => {
+  setupAdminUser();
+});
 
 // Security Middleware
 app.use(helmet()); // Adds various HTTP headers for security
@@ -48,6 +52,7 @@ if (config.nodeEnv === 'development') {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/investments', investmentRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Error Handling
 app.use(notFound);
