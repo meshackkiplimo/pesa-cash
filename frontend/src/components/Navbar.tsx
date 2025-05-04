@@ -39,12 +39,6 @@ export default function Navbar() {
                   >
                     Investment
                   </Link>
-                  <Link
-                    href="/statistics"
-                    className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
-                  >
-                    Manage Statistics
-                  </Link>
                   {user?.role === 'admin' && (
                     <>
                       <Link
@@ -63,7 +57,7 @@ export default function Navbar() {
                         href="/admin/statistics"
                         className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
                       >
-                        Statistics
+                        Manage Statistics
                       </Link>
                     </>
                   )}
@@ -165,13 +159,6 @@ export default function Navbar() {
              >
                Investment
              </Link>
-             <Link
-               href="/statistics"
-               className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
-               onClick={() => setMobileMenuOpen(false)}
-             >
-               Manage Statistics
-             </Link>
               {user?.role === 'admin' && (
                 <>
                   <Link
@@ -193,7 +180,7 @@ export default function Navbar() {
                     className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Statistics
+                    Manage Statistics
                   </Link>
                 </>
               )}
