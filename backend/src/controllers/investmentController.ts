@@ -217,33 +217,20 @@ export const investmentController = {
 
   async getStats(req: AuthRequest, res: Response) {
     try {
-      const userId = req.user?.userId;
-      const investments = await Investment.find({ userId });
-
+      // Fetch all investments regardless of status
+      const investments = await Investment.aggregate([
+        { $group: {
+            _id: null,
+            totalDeposits: { $sum: '$amount' }
+          }
+        }
+      ]);
+      
       const stats = {
-        totalInvested: 0,
-        returns: 0,
-        activeInvestments: 0,
-        projectedReturns: 0
+        totalDeposits: investments[0]?.totalDeposits || 0
       };
 
-      investments.forEach(investment => {
-        // Calculate total invested amount
-        stats.totalInvested += investment.amount;
-
-        // Calculate current returns
-        stats.returns += investment.returns;
-
-        // Count active investments
-        if (investment.status === 'active') {
-          stats.activeInvestments += 1;
-        }
-
-        // Calculate projected returns (example: 10% return on active investments)
-        if (investment.status === 'active') {
-          stats.projectedReturns += investment.amount * 0.1;
-        }
-      });
+      console.log('Total deposits calculated:', stats.totalDeposits); // Debug log
 
       res.json({
         status: 'success',

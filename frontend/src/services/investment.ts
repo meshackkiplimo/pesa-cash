@@ -49,7 +49,9 @@ class InvestmentService {
       throw new Error(error.message || 'Failed to fetch investment stats');
     }
 
-    return response.json();
+    const result = await response.json();
+    console.log('Stats response:', result); // Debug log
+    return result.data; // Extract the data from the response
   }
 
   async checkPaymentStatus(checkoutRequestId: string): Promise<any> {
