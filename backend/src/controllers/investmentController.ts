@@ -3,7 +3,6 @@ import { Request } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { mpesaService } from '../services/mpesa';
 import { Investment } from '../models/Investment';
-import mongoose from 'mongoose';
 
 interface InvestmentRequest {
   amount: number;
@@ -253,68 +252,25 @@ export const investmentController = {
     }
   },
 
-  async getAdminStats(req: AuthRequest, res: Response) {
+  async getStats(req: AuthRequest, res: Response) {
     try {
-      const aggregationResults = await Promise.all([
-        Investment.aggregate([
-          {
-            $group: {
-              _id: null,
-              totalDeposits: { $sum: '$amount' },
-              totalReturns: { $sum: '$returns' },
-              uniqueUsers: { $addToSet: '$userId' },
-              totalTransactions: { $sum: 1 }
-            }
-          },
-          {
-            $project: {
-              _id: 0,
-              totalDeposits: 1,
-              totalReturns: 1,
-              uniqueUsers: { $size: '$uniqueUsers' },
-              totalTransactions: 1
-            }
-          }
-        ]),
+      const investments = await Investment.find({});
+      const totalDeposits = investments.reduce((sum, inv) => sum + inv.amount, 0);
 
-        Investment.aggregate([
-          {
-            $group: {
-              _id: '$status',
-              count: { $sum: 1 },
-              totalAmount: { $sum: '$amount' }
-            }
-          }
-        ])
-      ]);
-
-      const [overallStats, statsByStatus] = aggregationResults;
-
-      const statusStats = statsByStatus.reduce((acc, stat) => {
-        acc[stat._id] = {
-          count: stat.count,
-          totalAmount: stat.totalAmount
-        };
-        return acc;
-      }, {} as Record<string, { count: number; totalAmount: number }>);
+      console.log('Found total investments:', investments.length);
+      console.log('Calculated total deposits:', totalDeposits);
 
       res.json({
         status: 'success',
         data: {
-          ...(overallStats[0] || {
-            totalDeposits: 0,
-            totalReturns: 0,
-            uniqueUsers: 0,
-            totalTransactions: 0
-          }),
-          statusBreakdown: statusStats
+          totalDeposits
         }
       });
     } catch (error) {
-      console.error('Get admin stats error:', error);
+      console.error('Get investment stats error:', error);
       res.status(500).json({
         status: 'error',
-        message: 'Failed to fetch admin statistics'
+        message: 'Failed to fetch investment statistics'
       });
     }
   }
