@@ -3,6 +3,7 @@ import { Request } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { mpesaService } from '../services/mpesa';
 import { Investment } from '../models/Investment';
+import mongoose from 'mongoose';
 
 interface InvestmentRequest {
   amount: number;
@@ -15,7 +16,6 @@ export const investmentController = {
       const { amount, phoneNumber }: InvestmentRequest = req.body;
       const userId = req.user?.userId;
 
-      // Validate request
       if (!amount || !phoneNumber) {
         return res.status(400).json({
           status: 'error',
@@ -23,7 +23,6 @@ export const investmentController = {
         });
       }
 
-      // Create a pending investment
       const investment = new Investment({
         userId,
         amount,
@@ -34,7 +33,6 @@ export const investmentController = {
       });
       await investment.save();
 
-      // Initiate STK Push
       const stkPushResponse = await mpesaService.initiateSTKPush(phoneNumber, amount);
       
       console.log('M-Pesa STK Push Response:', JSON.stringify(stkPushResponse, null, 2));
@@ -44,7 +42,6 @@ export const investmentController = {
         throw new Error('Invalid M-Pesa response');
       }
 
-      // Update investment with transaction details
       investment.transactionDetails = {
         ...investment.transactionDetails,
         checkoutRequestId: stkPushResponse.CheckoutRequestID,
@@ -70,13 +67,11 @@ export const investmentController = {
     }
   },
 
-  // Callback URL for M-Pesa
   async mpesaCallback(req: Request, res: Response) {
     try {
       const { Body } = req.body;
       const { stkCallback } = Body;
 
-      // Find investment by CheckoutRequestID
       const investment = await Investment.findOne({
         'transactionDetails.checkoutRequestId': stkCallback.CheckoutRequestID
       });
@@ -90,10 +85,6 @@ export const investmentController = {
       }
 
       if (stkCallback.ResultCode === 0) {
-        // Payment successful
-        console.log('M-Pesa Callback Data:', JSON.stringify(stkCallback, null, 2));
-
-        // Extract M-Pesa receipt number from callback metadata
         const mpesaReceiptNumber = stkCallback.CallbackMetadata?.Item?.find(
           (item: any) => item.Name === 'MpesaReceiptNumber'
         )?.Value;
@@ -110,17 +101,14 @@ export const investmentController = {
         };
         await investment.save();
 
-        // Send acknowledgment to Safaricom
         res.json({
           status: 'success',
           message: 'Payment processed successfully'
         });
       } else {
-        // Payment failed
         investment.status = 'failed';
         await investment.save();
 
-        console.error('Payment failed:', stkCallback.ResultDesc);
         res.json({
           status: 'error',
           message: stkCallback.ResultDesc
@@ -135,7 +123,6 @@ export const investmentController = {
     }
   },
 
-  // Check payment status
   async checkPaymentStatus(req: Request, res: Response) {
     try {
       const { checkoutRequestId } = req.params;
@@ -147,7 +134,6 @@ export const investmentController = {
         });
       }
 
-      // First check the investment in database
       const investment = await Investment.findOne({
         'transactionDetails.checkoutRequestId': checkoutRequestId
       });
@@ -159,19 +145,16 @@ export const investmentController = {
         });
       }
 
-      // Check real-time status from Mpesa
       const mpesaResponse = await mpesaService.checkTransactionStatus(checkoutRequestId);
 
-      // Update investment status based on Mpesa response
       let status = investment.status;
       
       if (Number(mpesaResponse.ResultCode) === 0) {
         status = 'active';
-      } else{
+      } else {
         status = 'failed';
       }
 
-      // Update investment status if it has changed
       if (status !== investment.status) {
         await Investment.findByIdAndUpdate(investment._id, {
           status,
@@ -200,7 +183,7 @@ export const investmentController = {
     try {
       const userId = req.user?.userId;
       const investments = await Investment.find({ userId })
-        .sort({ date: -1 }); // Sort by date in descending order
+        .sort({ date: -1 });
 
       res.json({
         status: 'success',
@@ -215,32 +198,123 @@ export const investmentController = {
     }
   },
 
-  async getStats(req: AuthRequest, res: Response) {
+  async getUserStats(req: AuthRequest, res: Response) {
     try {
-      // Fetch all investments regardless of status
-      const investments = await Investment.aggregate([
-        { $group: {
+      const userId = req.user?.userId;
+      
+      const stats = await Investment.aggregate([
+        { 
+          $match: { 
+            userId: userId,
+            status: { $in: ['active', 'completed'] }
+          }
+        },
+        {
+          $group: {
             _id: null,
-            totalDeposits: { $sum: '$amount' }
+            totalDeposits: { $sum: '$amount' },
+            totalReturns: { $sum: '$returns' },
+            totalInvestments: { $sum: 1 },
+            activeInvestments: {
+              $sum: {
+                $cond: [{ $eq: ['$status', 'active'] }, 1, 0]
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            totalDeposits: 1,
+            totalReturns: 1,
+            totalInvestments: 1,
+            activeInvestments: 1
           }
         }
       ]);
-      
-      const stats = {
-        totalDeposits: investments[0]?.totalDeposits || 0
-      };
 
-      console.log('Total deposits calculated:', stats.totalDeposits); // Debug log
+      const defaultStats = {
+        totalDeposits: 0,
+        totalReturns: 0,
+        totalInvestments: 0,
+        activeInvestments: 0
+      };
 
       res.json({
         status: 'success',
-        data: stats
+        data: stats[0] || defaultStats
       });
     } catch (error) {
-      console.error('Get investment stats error:', error);
+      console.error('Get user stats error:', error);
       res.status(500).json({
         status: 'error',
-        message: 'Failed to fetch investment statistics'
+        message: 'Failed to fetch user statistics'
+      });
+    }
+  },
+
+  async getAdminStats(req: AuthRequest, res: Response) {
+    try {
+      const aggregationResults = await Promise.all([
+        Investment.aggregate([
+          {
+            $group: {
+              _id: null,
+              totalDeposits: { $sum: '$amount' },
+              totalReturns: { $sum: '$returns' },
+              uniqueUsers: { $addToSet: '$userId' },
+              totalTransactions: { $sum: 1 }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              totalDeposits: 1,
+              totalReturns: 1,
+              uniqueUsers: { $size: '$uniqueUsers' },
+              totalTransactions: 1
+            }
+          }
+        ]),
+
+        Investment.aggregate([
+          {
+            $group: {
+              _id: '$status',
+              count: { $sum: 1 },
+              totalAmount: { $sum: '$amount' }
+            }
+          }
+        ])
+      ]);
+
+      const [overallStats, statsByStatus] = aggregationResults;
+
+      const statusStats = statsByStatus.reduce((acc, stat) => {
+        acc[stat._id] = {
+          count: stat.count,
+          totalAmount: stat.totalAmount
+        };
+        return acc;
+      }, {} as Record<string, { count: number; totalAmount: number }>);
+
+      res.json({
+        status: 'success',
+        data: {
+          ...(overallStats[0] || {
+            totalDeposits: 0,
+            totalReturns: 0,
+            uniqueUsers: 0,
+            totalTransactions: 0
+          }),
+          statusBreakdown: statusStats
+        }
+      });
+    } catch (error) {
+      console.error('Get admin stats error:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to fetch admin statistics'
       });
     }
   }

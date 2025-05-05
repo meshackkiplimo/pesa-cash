@@ -8,7 +8,13 @@ const router = express.Router();
 // Protected routes (require authentication)
 router.post('/', auth, investmentController.createInvestment);
 router.get('/', auth, investmentController.getInvestments);
-router.get('/stats', auth, adminAuth, investmentController.getStats);
+
+// User stats - only requires auth, no admin privileges
+router.get('/user-stats', auth, investmentController.getStats);
+
+// Admin stats - requires both auth and admin privileges
+router.get('/admin/stats', auth, adminAuth, investmentController.getStats);
+
 router.get('/payment-status/:checkoutRequestId', auth, investmentController.checkPaymentStatus);
 
 // M-Pesa callback URL (public)

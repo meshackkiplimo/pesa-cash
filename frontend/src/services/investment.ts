@@ -36,11 +36,12 @@ class InvestmentService {
       throw new Error(error.message || 'Failed to fetch investments');
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.data;
   }
 
-  async getStats(): Promise<InvestmentStats> {
-    const response = await fetch(`${API_URL}/investments/stats`, {
+  async getUserStats(): Promise<InvestmentStats> {
+    const response = await fetch(`${API_URL}/investments/user-stats`, {
       headers: this.getHeaders(),
     });
 
@@ -50,8 +51,21 @@ class InvestmentService {
     }
 
     const result = await response.json();
-    console.log('Stats response:', result); // Debug log
-    return result.data; // Extract the data from the response
+    return result.data;
+  }
+
+  async getStats(): Promise<InvestmentStats> {
+    const response = await fetch(`${API_URL}/investments/admin/stats`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch admin investment stats');
+    }
+
+    const result = await response.json();
+    return result.data;
   }
 
   async checkPaymentStatus(checkoutRequestId: string): Promise<any> {
