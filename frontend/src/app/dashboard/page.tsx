@@ -92,7 +92,7 @@ return (
         <div className="bg-gray-800 rounded-lg shadow-lg p-5 sm:p-6 border border-gray-700">
           <h3 className="text-gray-400 text-sm font-medium mb-2">Total Invested</h3>
           <p className="text-xl sm:text-2xl font-bold text-white">
-            KES {stats.totalInvested.toLocaleString()}
+            KES {stats.totalDeposits.toLocaleString()}
           </p>
         </div>
 

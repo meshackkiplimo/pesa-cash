@@ -42,7 +42,19 @@ export default function IndividualInvestmentPage() {
             ))}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Total Deposits Card */}
+            <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+              <h2 className="text-xl font-semibold text-white mb-2">Total Deposits</h2>
+              <p className="text-3xl font-bold text-green-400">
+                KES {investments
+                  .filter(inv => inv.status === 'active')
+                  .reduce((sum, inv) => sum + inv.amount, 0)
+                  .toLocaleString()}
+              </p>
+            </div>
+
+            {/* Individual Investments List */}
             {investments.map((investment) => (
               <div
                 key={investment._id}

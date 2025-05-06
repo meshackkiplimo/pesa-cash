@@ -37,8 +37,10 @@ export interface InvestmentResponse {
 export interface InvestmentStats {
   totalDeposits: number;
   totalReturns: number;
-  totalInvestments: number;
+  returns: number;
   activeInvestments: number;
+  totalInvestments: number;
+  projectedReturns: number;
 }
 
 export interface PaymentStatusResponse {

@@ -5,7 +5,14 @@ import { investmentService } from '@/services/investment';
 import { InvestmentStats } from '@/types/investment';
 
 export default function UserStatsNavbar() {
-  const [stats, setStats] = useState<InvestmentStats>({ totalDeposits: 0 });
+  const [stats, setStats] = useState<InvestmentStats>({
+    totalDeposits: 0,
+    totalReturns: 0,
+    returns: 0,
+    activeInvestments: 0,
+    totalInvestments: 0,
+    projectedReturns: 0
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
