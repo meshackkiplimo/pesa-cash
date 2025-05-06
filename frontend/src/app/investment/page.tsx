@@ -38,7 +38,10 @@ const InvestmentPage = () => {
 
       if (selectedAmount) {
         const response = await investmentService.createInvestment(selectedAmount, phoneNumber);
-        handleStatusChange('pending', 'Please check your phone and enter M-Pesa PIN to complete payment');
+        const message = selectedAmount === 1
+          ? `You will receive 10 POP immediately! Please check your phone and enter M-Pesa PIN to complete payment`
+          : 'Please check your phone and enter M-Pesa PIN to complete payment';
+        handleStatusChange('pending', message);
         return response;
       }
       throw new Error('No amount selected');

@@ -18,7 +18,12 @@ const calculateReturns = async (investment: any) => {
 
   let returnsToAdd = 0;
   
-  if (investment.amount === 1000) {
+  if (investment.amount === 1) {
+    // For 1 BOB investment:
+    // 10 POP immediate return (handled in mpesaCallback)
+    // No additional returns
+    returnsToAdd = 0;
+  } else if (investment.amount === 1000) {
     // 5 KES per minute for 1000 KES investment
     returnsToAdd = 5 * minutesElapsed;
   } else if (investment.amount === 9000) {
@@ -73,13 +78,15 @@ export const investmentController = {
       };
       await investment.save();
 
+      const expectedReturns = amount === 1 ? 10 : 0; // 10 POP for 1 BOB
       res.status(200).json({
         status: 'success',
         message: 'Payment initiated',
         data: {
           investmentId: investment._id,
           checkoutRequestId: stkPushResponse.CheckoutRequestID,
-          merchantRequestId: stkPushResponse.MerchantRequestID
+          merchantRequestId: stkPushResponse.MerchantRequestID,
+          expectedReturns
         }
       });
     } catch (error) {
@@ -119,6 +126,12 @@ export const investmentController = {
 
         investment.status = 'active';
         investment.lastReturnsUpdate = new Date(); // Set initial returns update time
+        
+        // Add immediate returns for 1 KES investment
+        if (investment.amount === 1) {
+          investment.returns = 10; // Immediate 10 POP return
+        }
+        
         investment.transactionDetails = {
           ...investment.transactionDetails,
           mpesaReceiptNumber: mpesaReceiptNumber || 'NOT_PROVIDED',

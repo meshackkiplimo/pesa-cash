@@ -110,9 +110,17 @@ const PaymentModal = ({
           <div className={`mb-4 p-3 rounded-lg ${
             status === 'success' ? 'bg-green-900/50 text-green-300' :
             status === 'failed' ? 'bg-red-900/50 text-red-300' :
+            amount === 1 ? 'bg-blue-900/50 text-blue-300 font-bold' :
             'bg-blue-900/50 text-blue-300'
           }`}>
-            {statusMessage}
+            {amount === 1 && status === 'pending' ? (
+              <>
+                <span className="font-bold text-blue-200">10 POP returns ready! </span>
+                {statusMessage}
+              </>
+            ) : (
+              statusMessage
+            )}
           </div>
         )}
         

@@ -31,6 +31,7 @@ export interface InvestmentResponse {
     investmentId: string;
     checkoutRequestId: string;
     merchantRequestId: string;
+    expectedReturns?: number;
   };
 }
 
