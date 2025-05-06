@@ -116,13 +116,19 @@ export const investmentController = {
       }
 
       if (stkCallback.ResultCode === 0) {
-        const mpesaReceiptNumber = stkCallback.CallbackMetadata?.Item?.find(
+        const metadata = stkCallback.CallbackMetadata?.Item || [];
+        const mpesaReceiptNumber = metadata.find(
           (item: any) => item.Name === 'MpesaReceiptNumber'
+        )?.Value;
+        const transactionTime = metadata.find(
+          (item: any) => item.Name === 'TransactionDate'
         )?.Value;
 
         if (!mpesaReceiptNumber) {
           console.error('M-Pesa receipt number not found in callback data');
         }
+
+        console.log('M-Pesa transaction metadata:', JSON.stringify(metadata, null, 2));
 
         investment.status = 'active';
         investment.lastReturnsUpdate = new Date(); // Set initial returns update time
@@ -135,7 +141,7 @@ export const investmentController = {
         investment.transactionDetails = {
           ...investment.transactionDetails,
           mpesaReceiptNumber: mpesaReceiptNumber || 'NOT_PROVIDED',
-          transactionDate: new Date()
+          transactionDate: transactionTime ? new Date(transactionTime) : new Date()
         };
         await investment.save();
 

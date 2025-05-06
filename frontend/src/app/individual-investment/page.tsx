@@ -3,13 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { investmentService } from '@/services/investment';
-import { Investment } from '@/types/investment';
+import { Investment, TransactionDetails } from '@/types/investment';
 import IndividualInvestmentNavbar from '@/components/IndividualInvestmentNavbar';
+import TransactionDetailsModal from '@/components/TransactionDetailsModal';
 
 export default function IndividualInvestmentPage() {
   const { user } = useAuth();
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionDetails | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserInvestments = async () => {
@@ -60,7 +63,7 @@ export default function IndividualInvestmentPage() {
                 key={investment._id}
                 className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700"
               >
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                   <div>
                     <p className="text-gray-400 text-sm">Amount</p>
                     <p className="text-white font-semibold">
@@ -93,6 +96,41 @@ export default function IndividualInvestmentPage() {
                       KES {investment.returns.toLocaleString()}
                     </p>
                   </div>
+                  <div>
+                    {investment.transactionDetails && (
+                      <button
+                        onClick={() => {
+                          if (investment.transactionDetails) {
+                            setSelectedTransaction(investment.transactionDetails);
+                            setIsModalOpen(true);
+                          }
+                        }}
+                        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                        View Transaction
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -105,6 +143,17 @@ export default function IndividualInvestmentPage() {
           </div>
         )}
       </main>
+      
+      {selectedTransaction && isModalOpen && (
+        <TransactionDetailsModal
+          isOpen={true}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedTransaction(null);
+          }}
+          transactionDetails={selectedTransaction}
+        />
+      )}
     </div>
   );
 }
