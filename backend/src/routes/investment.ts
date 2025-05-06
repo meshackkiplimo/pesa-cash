@@ -12,8 +12,9 @@ router.get('/', auth, investmentController.getInvestments);
 // User stats - only requires auth
 router.get('/user-stats', auth, investmentController.getUserStats);
 
-// Admin stats - requires both auth and admin privileges
+// Admin stats and operations - requires both auth and admin privileges
 router.get('/stats', auth, adminAuth, investmentController.getStats);
+router.post('/update-returns', auth, adminAuth, investmentController.updateReturns);
 
 // Payment status
 router.get('/payment-status/:checkoutRequestId', auth, investmentController.checkPaymentStatus);

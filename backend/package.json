@@ -11,6 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.17",
     "axios": "^1.9.0",
     "bcryptjs": "^2.4.3",
@@ -23,6 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.3",
     "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.10.1"
   },
   "devDependencies": {

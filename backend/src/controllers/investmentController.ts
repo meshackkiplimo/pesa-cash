@@ -9,6 +9,31 @@ interface InvestmentRequest {
   phoneNumber: string;
 }
 
+const calculateReturns = async (investment: any) => {
+  if (investment.status !== 'active') return;
+
+  const now = new Date();
+  const lastUpdate = investment.lastReturnsUpdate;
+  const minutesElapsed = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60));
+
+  let returnsToAdd = 0;
+  
+  if (investment.amount === 1000) {
+    // 5 KES per minute for 1000 KES investment
+    returnsToAdd = 5 * minutesElapsed;
+  } else if (investment.amount === 9000) {
+    // 90 KES per 5 minutes for 9000 KES investment
+    const fiveMinutePeriods = Math.floor(minutesElapsed / 5);
+    returnsToAdd = 90 * fiveMinutePeriods;
+  }
+
+  if (returnsToAdd > 0) {
+    investment.returns += returnsToAdd;
+    investment.lastReturnsUpdate = now;
+    await investment.save();
+  }
+};
+
 export const investmentController = {
   async createInvestment(req: AuthRequest, res: Response) {
     try {
@@ -93,6 +118,7 @@ export const investmentController = {
         }
 
         investment.status = 'active';
+        investment.lastReturnsUpdate = new Date(); // Set initial returns update time
         investment.transactionDetails = {
           ...investment.transactionDetails,
           mpesaReceiptNumber: mpesaReceiptNumber || 'NOT_PROVIDED',
@@ -178,11 +204,39 @@ export const investmentController = {
     }
   },
 
+  async updateReturns(req: Request, res: Response) {
+    try {
+      const investments = await Investment.find({ status: 'active' });
+      
+      for (const investment of investments) {
+        await calculateReturns(investment);
+      }
+
+      res.json({
+        status: 'success',
+        message: 'Returns updated successfully'
+      });
+    } catch (error) {
+      console.error('Update returns error:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to update returns'
+      });
+    }
+  },
+
   async getInvestments(req: AuthRequest, res: Response) {
     try {
       const userId = req.user?.userId;
       const investments = await Investment.find({ userId })
         .sort({ date: -1 });
+
+      // Calculate returns for active investments before sending response
+      for (const investment of investments) {
+        if (investment.status === 'active') {
+          await calculateReturns(investment);
+        }
+      }
 
       res.json({
         status: 'success',

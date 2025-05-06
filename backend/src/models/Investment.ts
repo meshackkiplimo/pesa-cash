@@ -6,6 +6,7 @@ export interface IInvestment extends Document {
   date: Date;
   status: 'active' | 'completed' | 'pending' | 'failed';
   returns: number;
+  lastReturnsUpdate: Date;
   transactionDetails?: {
     checkoutRequestId?: string;
     merchantRequestId?: string;
@@ -16,6 +17,10 @@ export interface IInvestment extends Document {
 }
 
 const investmentSchema = new Schema({
+  lastReturnsUpdate: {
+    type: Date,
+    default: Date.now
+  },
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',

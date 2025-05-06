@@ -1,4 +1,5 @@
 import express, { Express } from 'express';
+import cron from 'node-cron';
 import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -10,6 +11,7 @@ import { errorHandler, notFound } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
 import investmentRoutes from './routes/investment';
 import adminRoutes from './routes/admin';
+import { Investment } from './models/Investment';
 
 // Initialize express app
 const app: Express = express();
@@ -67,6 +69,38 @@ const PORT = config.port;
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running in ${config.nodeEnv} mode on port ${PORT}`);
+
+  // Set up cron job to update investment returns every minute
+  cron.schedule('* * * * *', async () => {
+    try {
+      const activeInvestments = await Investment.find({ status: 'active' });
+      for (const investment of activeInvestments) {
+        const now = new Date();
+        const lastUpdate = investment.lastReturnsUpdate;
+        const minutesElapsed = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60));
+
+        let returnsToAdd = 0;
+        
+        if (investment.amount === 1000) {
+          // 5 KES per minute for 1000 KES investment
+          returnsToAdd = 5 * minutesElapsed;
+        } else if (investment.amount === 9000) {
+          // 90 KES per 5 minutes for 9000 KES investment
+          const fiveMinutePeriods = Math.floor(minutesElapsed / 5);
+          returnsToAdd = 90 * fiveMinutePeriods;
+        }
+
+        if (returnsToAdd > 0) {
+          investment.returns += returnsToAdd;
+          investment.lastReturnsUpdate = now;
+          await investment.save();
+          console.log(`Updated returns for investment ${investment._id}: +${returnsToAdd} KES`);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating investment returns:', error);
+    }
+  });
 });
 
 // Handle unhandled promise rejections
