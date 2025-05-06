@@ -201,18 +201,18 @@ export const investmentController = {
     try {
       const userId = req.user?.userId;
       
-      // First get total deposits including pending investments
-      const totalDeposits = await Investment.aggregate([
+      // Calculate total deposits for active investments
+      const totalActiveDeposits = await Investment.aggregate([
         {
           $match: {
             userId: userId,
-            status: 'active'  // Only count active investments
+            status: 'active'
           }
         },
         {
           $group: {
             _id: null,
-            total: { $sum: '$amount' }  // This will sum up all deposits
+            total: { $sum: '$amount' }
           }
         }
       ]);
@@ -258,7 +258,7 @@ export const investmentController = {
 
       // Combine the stats
       const defaultStats = {
-        totalDeposits: totalDeposits[0]?.total || 0,
+        totalDeposits: totalActiveDeposits[0]?.total || 0,
         totalReturns: 0,
         returns: 0,
         totalInvestments: 0,
@@ -267,7 +267,7 @@ export const investmentController = {
       };
 
       const finalStats = stats[0]
-        ? { ...stats[0], totalDeposits: totalDeposits[0]?.total || 0 }
+        ? { ...stats[0], totalDeposits: totalActiveDeposits[0]?.total || 0 }
         : defaultStats;
 
       res.json({

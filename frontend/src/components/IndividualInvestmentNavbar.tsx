@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { investmentService } from '@/services/investment';
-import { InvestmentStats } from '@/types/investment';
+import { InvestmentStats, Investment } from '@/types/investment';
 import Link from 'next/link';
 
 export default function IndividualInvestmentNavbar() {
   const { user } = useAuth();
+  const [investments, setInvestments] = useState<Investment[]>([]);
   const [stats, setStats] = useState<InvestmentStats>({
     totalDeposits: 0,
     totalReturns: 0,
@@ -19,11 +20,24 @@ export default function IndividualInvestmentNavbar() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserStats = async () => {
+    const fetchData = async () => {
       try {
         if (user) {
+          // Fetch investments first
+          const investmentsData = await investmentService.getInvestments();
+          setInvestments(investmentsData);
+          
+          // Calculate total deposits from active investments
+          const totalDeposits = investmentsData
+            .filter(inv => inv.status === 'active')
+            .reduce((sum, inv) => sum + inv.amount, 0);
+          
+          // Fetch other stats
           const userStats = await investmentService.getUserStats();
-          setStats(userStats);
+          setStats({
+            ...userStats,
+            totalDeposits // Override totalDeposits with our calculation
+          });
         }
       } catch (error) {
         console.error('Failed to fetch user stats:', error);
@@ -32,7 +46,7 @@ export default function IndividualInvestmentNavbar() {
       }
     };
 
-    fetchUserStats();
+    fetchData();
   }, [user]);
 
   if (!user) return null;
