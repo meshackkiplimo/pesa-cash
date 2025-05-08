@@ -12,18 +12,19 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsData, investmentsData] = await Promise.all([
-          investmentService.getStats().catch(() => null),
-          investmentService.getInvestments().catch(() => [])
-        ]);
-        
-        if (statsData && Array.isArray(investmentsData)) {
+        // Fetch user stats and investments separately to better handle errors
+        const statsData = await investmentService.getUserStats();
+        if (statsData) {
           setStats(statsData);
+        }
+
+        const investmentsData = await investmentService.getInvestments();
+        if (Array.isArray(investmentsData)) {
           setInvestments(investmentsData);
         }
       } catch (error) {
-        // Silently handle errors, keeping UI clean
         console.error('Failed to fetch dashboard data:', error);
+        // Don't set empty investments array on error to avoid false "no investments" state
       } finally {
         setLoading(false);
       }
@@ -32,7 +33,18 @@ const DashboardPage = () => {
     fetchData();
   }, []);
 // Show investment card if loading, error, or no investments
-if (loading || !stats || investments.length === 0) {
+// Show loading state
+if (loading) {
+  return <div className="text-white text-center py-8">Loading...</div>;
+}
+
+// Show error state if data couldn't be loaded
+if (!stats || !investments) {
+  return <div className="text-white text-center py-8">Unable to load dashboard data. Please refresh the page.</div>;
+}
+
+// Show first investment card only if we successfully loaded data and there are no investments
+if (investments.length === 0) {
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
       <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-white">Welcome to Your Investment Journey</h1>
