@@ -150,8 +150,8 @@ export const investmentController = {
           message: 'Payment processed successfully'
         });
       } else {
-        investment.status = 'failed';
-        await investment.save();
+        // Delete the investment record if transaction fails
+        await Investment.findByIdAndDelete(investment._id);
 
         res.json({
           status: 'error',
@@ -194,26 +194,33 @@ export const investmentController = {
       let status = investment.status;
       
       if (Number(mpesaResponse.ResultCode) === 0) {
-        status = 'active';
-      } else {
-        status = 'failed';
-      }
-
-      if (status !== investment.status) {
+        // Update status to active if successful
         await Investment.findByIdAndUpdate(investment._id, {
-          status,
+          status: 'active',
           'transactionDetails.lastChecked': new Date()
         });
-      }
 
-      res.json({
-        status: 'success',
-        data: {
-          status,
-          mpesaStatus: mpesaResponse.ResultDesc,
-          ResultCode: Number(mpesaResponse.ResultCode)
-        }
-      });
+        res.json({
+          status: 'success',
+          data: {
+            status: 'active',
+            mpesaStatus: mpesaResponse.ResultDesc,
+            ResultCode: Number(mpesaResponse.ResultCode)
+          }
+        });
+      } else {
+        // Delete the investment record if transaction failed
+        await Investment.findByIdAndDelete(investment._id);
+
+        res.json({
+          status: 'error',
+          data: {
+            status: 'failed',
+            mpesaStatus: mpesaResponse.ResultDesc,
+            ResultCode: Number(mpesaResponse.ResultCode)
+          }
+        });
+      }
     } catch (error) {
       console.error('Payment status check error:', error);
       res.status(500).json({
