@@ -18,6 +18,7 @@ const InvestmentPage = () => {
     200000,
     250000,
     300000,
+    10,
     1,
   ];
 
@@ -38,9 +39,12 @@ const InvestmentPage = () => {
 
       if (selectedAmount) {
         const response = await investmentService.createInvestment(selectedAmount, phoneNumber);
-        const message = selectedAmount === 1
-          ? `You will receive 10 POP immediately! Please check your phone and enter M-Pesa PIN to complete payment`
-          : 'Please check your phone and enter M-Pesa PIN to complete payment';
+        let message = 'Please check your phone and enter M-Pesa PIN to complete payment';
+        if (selectedAmount === 1) {
+          message = 'You will receive 10 POP immediately! Please check your phone and enter M-Pesa PIN to complete payment';
+        } else if (selectedAmount === 10) {
+          message = 'Invest 10 shillings and start your investment journey! Please check your phone and enter M-Pesa PIN';
+        }
         handleStatusChange('pending', message);
         return response;
       }
