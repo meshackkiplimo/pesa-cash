@@ -17,5 +17,6 @@ router.patch('/users/:userId/status', adminController.updateUserStatus);
 
 // Investment routes
 router.get('/investments', adminController.getInvestments);
+router.delete('/investments/:investmentId', adminController.deleteInvestment);
 
 export default router;

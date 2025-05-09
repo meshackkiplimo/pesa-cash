@@ -9,6 +9,7 @@ export default function InvestmentsPage() {
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
 
@@ -52,6 +53,7 @@ export default function InvestmentsPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Returns</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -80,6 +82,28 @@ export default function InvestmentsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     KES {investment.returns.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={async () => {
+                        if (window.confirm('Are you sure you want to delete this investment?')) {
+                          setIsDeleting(true);
+                          try {
+                            await adminService.deleteInvestment(investment._id);
+                            setInvestments(investments.filter(inv => inv._id !== investment._id));
+                          } catch (error) {
+                            setError('Failed to delete investment');
+                            console.error('Error deleting investment:', error);
+                          } finally {
+                            setIsDeleting(false);
+                          }
+                        }
+                      }}
+                      disabled={isDeleting}
+                      className="text-red-600 hover:text-red-900 disabled:text-red-300"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}

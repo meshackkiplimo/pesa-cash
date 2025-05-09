@@ -67,5 +67,19 @@ export const adminService = {
     }
 
     return response.json();
+  },
+
+  async deleteInvestment(investmentId: string): Promise<void> {
+    const response = await fetch(`${BASE_URL}/investments/${investmentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete investment');
+    }
   }
 };

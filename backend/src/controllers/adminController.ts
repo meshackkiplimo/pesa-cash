@@ -89,5 +89,22 @@ export const adminController = {
     } catch (error) {
       res.status(500).json({ message: 'Error fetching investments' });
     }
+  },
+
+  // Delete an investment
+  async deleteInvestment(req: Request, res: Response) {
+    try {
+      const { investmentId } = req.params;
+      
+      const investment = await Investment.findByIdAndDelete(investmentId);
+
+      if (!investment) {
+        return res.status(404).json({ message: 'Investment not found' });
+      }
+
+      res.json({ message: 'Investment deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Error deleting investment' });
+    }
   }
 };

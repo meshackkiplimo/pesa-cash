@@ -384,5 +384,40 @@ export const investmentController = {
         message: 'Failed to fetch investment statistics'
       });
     }
+  },
+
+  async deleteInvestment(req: AuthRequest, res: Response) {
+    try {
+      const { investmentId } = req.params;
+
+      if (!investmentId) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Investment ID is required'
+        });
+      }
+
+      const investment = await Investment.findById(investmentId);
+
+      if (!investment) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Investment not found'
+        });
+      }
+
+      await Investment.findByIdAndDelete(investmentId);
+
+      res.json({
+        status: 'success',
+        message: 'Investment deleted successfully'
+      });
+    } catch (error) {
+      console.error('Delete investment error:', error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to delete investment'
+      });
+    }
   }
 };
