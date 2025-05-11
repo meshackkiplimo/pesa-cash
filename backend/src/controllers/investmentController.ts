@@ -19,17 +19,14 @@ const calculateReturns = async (investment: any) => {
   let returnsToAdd = 0;
   
   if (investment.amount === 1) {
-    // For 1 BOB investment:
-    // 10 POP immediate return (handled in mpesaCallback)
-    // No additional returns
-    returnsToAdd = 0;
-  } else if (investment.amount === 1000) {
-    // 5 KES per minute for 1000 KES investment
+    // For 1 BOB investment: 5 bob returns per minute
     returnsToAdd = 5 * minutesElapsed;
-  } else if (investment.amount === 9000) {
-    // 90 KES per 5 minutes for 9000 KES investment
-    const fiveMinutePeriods = Math.floor(minutesElapsed / 5);
-    returnsToAdd = 90 * fiveMinutePeriods;
+  } else if (investment.amount === 5) {
+    // For 5 BOB investment: 8 bob returns per minute
+    returnsToAdd = 8 * minutesElapsed;
+  } else if (investment.amount === 10) {
+    // For 10 BOB investment: 15 bob returns per minute
+    returnsToAdd = 15 * minutesElapsed;
   }
 
   if (returnsToAdd > 0) {
@@ -57,14 +54,19 @@ export const investmentController = {
       let cycleDays = 0;
       
       if (amount === 1) {
-        dailyReturn = 10; // 10 POP immediate return
-        cycleDays = 1;
-      } else if (amount === 1000) {
-        dailyReturn = 7200; // 5 KES per minute = 7200 KES per day
+        dailyReturn = 7200; // 5 bob per minute = 7200 per day
         cycleDays = 3;
-      } else if (amount === 9000) {
-        dailyReturn = 25920; // 90 KES per 5 minutes = 25920 KES per day
-        cycleDays = 3;
+      } else if (amount === 5) {
+        dailyReturn = 11520; // 8 bob per minute = 11520 per day
+        cycleDays = 6;
+      } else if (amount === 10) {
+        dailyReturn = 21600; // 15 bob per minute = 21600 per day
+        cycleDays = 8;
+      } else {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Invalid investment amount. Only 1, 5, or 10 bob investments are allowed.'
+        });
       }
 
       const investment = new Investment({
@@ -150,10 +152,8 @@ export const investmentController = {
         investment.status = 'active';
         investment.lastReturnsUpdate = new Date(); // Set initial returns update time
         
-        // Add immediate returns for 1 KES investment
-        if (investment.amount === 1) {
-          investment.returns = 10; // Immediate 10 POP return
-        }
+        // Initialize returns to 0 for all investments
+        investment.returns = 0;
         
         investment.transactionDetails = {
           ...investment.transactionDetails,

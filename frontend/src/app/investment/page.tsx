@@ -20,9 +20,9 @@ const InvestmentPage = () => {
   }
 
   const investmentOptions: InvestmentOption[] = [
-    { amount: 1, dailyReturn: 2, durationDays: 2 },
-    { amount: 5, dailyReturn: 7, durationDays: 4 },
-    { amount: 10, dailyReturn: 12, durationDays: 8 },
+    { amount: 1, dailyReturn: 7200, durationDays: 3 },  // 5 bob per minute = 7200 per day for 3 days
+    { amount: 5, dailyReturn: 11520, durationDays: 6 }, // 8 bob per minute = 11520 per day for 6 days
+    { amount: 10, dailyReturn: 21600, durationDays: 8 }, // 15 bob per minute = 21600 per day for 8 days
   ];
 
   const handleSelect = (option: InvestmentOption) => {
@@ -83,13 +83,16 @@ const InvestmentPage = () => {
               </h2>
               <div className="space-y-2">
                 <p className={`text-sm ${selectedAmount === option.amount ? 'text-white' : 'text-gray-300'}`}>
-                  Daily Return: KES {option.dailyReturn}
+                  Per Minute Return: KES {option.amount === 1 ? '5' : option.amount === 5 ? '8' : '15'}
+                </p>
+                <p className={`text-sm ${selectedAmount === option.amount ? 'text-white' : 'text-gray-300'}`}>
+                  Daily Return: KES {option.dailyReturn.toLocaleString()}
                 </p>
                 <p className={`text-sm ${selectedAmount === option.amount ? 'text-white' : 'text-gray-300'}`}>
                   Duration: {option.durationDays} days
                 </p>
                 <p className={`text-sm ${selectedAmount === option.amount ? 'text-white' : 'text-gray-300'}`}>
-                  Total Returns: KES {calculateTotalReturns(option)}
+                  Total Returns: KES {calculateTotalReturns(option).toLocaleString()}
                 </p>
                 {selectedAmount === option.amount && (
                   <div className="mt-2">
