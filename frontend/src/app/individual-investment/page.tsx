@@ -152,12 +152,6 @@ export default function IndividualInvestmentPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-sm">Total Expected Returns</p>
-                    <p className="text-purple-400 font-semibold">
-                      KES {stats ? (investment.returns + (stats.projectedReturns / stats.activeInvestments)).toLocaleString() : '...'}
-                    </p>
-                  </div>
-                  <div>
                     {investment.transactionDetails && (
                       <button
                         onClick={() => {
