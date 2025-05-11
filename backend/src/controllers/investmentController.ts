@@ -13,27 +13,43 @@ const calculateReturns = async (investment: any) => {
   if (investment.status !== 'active') return;
 
   const now = new Date();
+  const startDate = investment.date;
   const lastUpdate = investment.lastReturnsUpdate;
   const minutesElapsed = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60));
+  const totalDaysElapsed = (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
 
   let returnsToAdd = 0;
+  let cycleDays = 0;
   
-  if (investment.amount === 1) {
-    // For 1 BOB investment: 5 bob returns per minute
-    returnsToAdd = 5 * minutesElapsed;
-  } else if (investment.amount === 5) {
-    // For 5 BOB investment: 8 bob returns per minute
-    returnsToAdd = 8 * minutesElapsed;
-  } else if (investment.amount === 10) {
-    // For 10 BOB investment: 15 bob returns per minute
-    returnsToAdd = 15 * minutesElapsed;
+  // Define cycle days based on investment amount
+  if (investment.amount === 1) cycleDays = 3;
+  else if (investment.amount === 5) cycleDays = 6;
+  else if (investment.amount === 10) cycleDays = 8;
+
+  // Only calculate returns if within cycle period
+  if (totalDaysElapsed <= cycleDays) {
+    if (investment.amount === 1) {
+      returnsToAdd = 5 * minutesElapsed; // 5 bob per minute
+    } else if (investment.amount === 5) {
+      returnsToAdd = 8 * minutesElapsed; // 8 bob per minute
+    } else if (investment.amount === 10) {
+      returnsToAdd = 15 * minutesElapsed; // 15 bob per minute
+    }
+
+    if (returnsToAdd > 0) {
+      investment.returns += returnsToAdd;
+      investment.lastReturnsUpdate = now;
+    }
+  } else {
+    // Only complete the investment if we've reached the exact cycle end
+    // This ensures investments stay active until their full cycle completes
+    const daysOverCycle = totalDaysElapsed - cycleDays;
+    if (daysOverCycle >= 0 && daysOverCycle < 1) { // Complete only when just past cycle
+      investment.status = 'completed';
+    }
   }
 
-  if (returnsToAdd > 0) {
-    investment.returns += returnsToAdd;
-    investment.lastReturnsUpdate = now;
-    await investment.save();
-  }
+  await investment.save();
 };
 
 export const investmentController = {

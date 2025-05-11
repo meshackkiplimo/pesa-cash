@@ -8,6 +8,11 @@ const DashboardPage = () => {
   const [stats, setStats] = useState<InvestmentStats | null>(null);
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showPastInvestments, setShowPastInvestments] = useState(false);
+
+  const filteredInvestments = investments.filter(inv =>
+    showPastInvestments ? inv.status === 'completed' : inv.status !== 'completed'
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -159,7 +164,19 @@ return (
 
       {/* Investment History Section */}
       <div>
-        <h2 className="text-2xl font-bold mb-6">Investment History</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-white">Investment History</h2>
+          <button
+            onClick={() => setShowPastInvestments(!showPastInvestments)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              showPastInvestments
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-600 text-white hover:bg-gray-700'
+            }`}
+          >
+            {showPastInvestments ? 'Show Active' : 'Show Past Investments'}
+          </button>
+        </div>
         <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-700">
@@ -183,7 +200,16 @@ return (
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
-              {investments.map((investment) => (
+              {filteredInvestments.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 sm:px-6 py-8 text-center text-gray-400">
+                    {showPastInvestments
+                      ? "No past investments found. Your investments will appear here when they complete their cycle."
+                      : "No active investments found. Start investing to see your investments here."}
+                  </td>
+                </tr>
+              ) : (
+                filteredInvestments.map((investment) => (
                 <tr key={investment._id}>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {new Date(investment.date).toLocaleDateString()}
@@ -209,7 +235,7 @@ return (
                     KES {(investment.dailyReturn * investment.cycleDays).toLocaleString()}
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
           </div>
