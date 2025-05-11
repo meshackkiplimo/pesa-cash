@@ -52,10 +52,27 @@ export const investmentController = {
         });
       }
 
+      // Set daily return and cycle days based on investment amount
+      let dailyReturn = 0;
+      let cycleDays = 0;
+      
+      if (amount === 1) {
+        dailyReturn = 10; // 10 POP immediate return
+        cycleDays = 1;
+      } else if (amount === 1000) {
+        dailyReturn = 7200; // 5 KES per minute = 7200 KES per day
+        cycleDays = 3;
+      } else if (amount === 9000) {
+        dailyReturn = 25920; // 90 KES per 5 minutes = 25920 KES per day
+        cycleDays = 3;
+      }
+
       const investment = new Investment({
         userId,
         amount,
         status: 'pending',
+        dailyReturn,
+        cycleDays,
         transactionDetails: {
           phoneNumber
         }
@@ -297,7 +314,11 @@ export const investmentController = {
           .reduce((sum, inv) => sum + inv.returns, 0),
         totalInvestments: investments.length,
         activeInvestments: activeInvestments.length,
-        projectedReturns: activeInvestments.reduce((sum, inv) => sum + (inv.amount * 0.15), 0)
+        projectedReturns: activeInvestments.reduce((sum, inv) => {
+          const totalExpectedReturns = inv.dailyReturn * inv.cycleDays;
+          const remainingReturns = totalExpectedReturns - inv.returns;
+          return sum + (remainingReturns > 0 ? remainingReturns : 0);
+        }, 0)
       };
 
       console.log('Calculated stats:', stats);

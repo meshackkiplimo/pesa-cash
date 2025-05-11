@@ -206,7 +206,7 @@ return (
                     +KES {investment.returns.toLocaleString()}
                   </td>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-purple-400">
-                    KES {(investment.returns + (stats.projectedReturns / stats.activeInvestments)).toLocaleString()}
+                    KES {(investment.dailyReturn * investment.cycleDays).toLocaleString()}
                   </td>
                 </tr>
               ))}

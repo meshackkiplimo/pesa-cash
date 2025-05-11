@@ -7,6 +7,8 @@ export interface IInvestment extends Document {
   status: 'active' | 'completed' | 'pending' | 'failed';
   returns: number;
   lastReturnsUpdate: Date;
+  dailyReturn: number;
+  cycleDays: number;
   transactionDetails?: {
     checkoutRequestId?: string;
     merchantRequestId?: string;
@@ -43,6 +45,14 @@ const investmentSchema = new Schema({
   returns: {
     type: Number,
     default: 0
+  },
+  dailyReturn: {
+    type: Number,
+    required: [true, 'Daily return amount is required']
+  },
+  cycleDays: {
+    type: Number,
+    required: [true, 'Investment cycle duration is required']
   },
   transactionDetails: {
     checkoutRequestId: String,

@@ -3,22 +3,27 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { investmentService } from '@/services/investment';
-import { Investment, TransactionDetails } from '@/types/investment';
+import { Investment, TransactionDetails, InvestmentStats } from '@/types/investment';
 import IndividualInvestmentNavbar from '@/components/IndividualInvestmentNavbar';
 import TransactionDetailsModal from '@/components/TransactionDetailsModal';
 
 export default function IndividualInvestmentPage() {
   const { user } = useAuth();
   const [investments, setInvestments] = useState<Investment[]>([]);
+  const [stats, setStats] = useState<InvestmentStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchUserInvestments = async () => {
+    const fetchData = async () => {
       try {
-        const data = await investmentService.getInvestments();
-        setInvestments(data);
+        const [investmentsData, statsData] = await Promise.all([
+          investmentService.getInvestments(),
+          investmentService.getUserStats()
+        ]);
+        setInvestments(investmentsData);
+        setStats(statsData);
       } catch (error) {
         console.error('Failed to fetch investments:', error);
       } finally {
@@ -26,7 +31,7 @@ export default function IndividualInvestmentPage() {
       }
     };
 
-    fetchUserInvestments();
+    fetchData();
   }, []);
 
   if (!user) return null;
@@ -63,7 +68,7 @@ export default function IndividualInvestmentPage() {
                 key={investment._id}
                 className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700"
               >
-                <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-6 gap-4">
                   <div>
                     <p className="text-gray-400 text-sm">Amount</p>
                     <p className="text-white font-semibold">
@@ -94,6 +99,18 @@ export default function IndividualInvestmentPage() {
                     <p className="text-gray-400 text-sm">Returns</p>
                     <p className="text-green-400 font-semibold">
                       KES {investment.returns.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm">Total Expected Returns</p>
+                    <p className="text-purple-400 font-semibold">
+                      KES {(investment.dailyReturn * investment.cycleDays).toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm">Total Expected Returns</p>
+                    <p className="text-purple-400 font-semibold">
+                      KES {stats ? (investment.returns + (stats.projectedReturns / stats.activeInvestments)).toLocaleString() : '...'}
                     </p>
                   </div>
                   <div>

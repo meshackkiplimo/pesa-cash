@@ -21,6 +21,8 @@ export interface Investment {
   date: string;
   status: 'active' | 'completed' | 'pending' | 'failed';
   returns: number;
+  dailyReturn: number;
+  cycleDays: number;
   transactionDetails?: TransactionDetails;
 }
 
