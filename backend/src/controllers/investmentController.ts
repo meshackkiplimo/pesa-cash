@@ -281,78 +281,30 @@ export const investmentController = {
     try {
       const userId = req.user?.userId;
       
-      // Calculate total deposits for active investments
-      const totalActiveDeposits = await Investment.aggregate([
-        {
-          $match: {
-            userId: userId,
-            status: 'active'
-          }
-        },
-        {
-          $group: {
-            _id: null,
-            total: { $sum: '$amount' }
-          }
-        }
-      ]);
-
-      // Then get other stats for active/completed investments only
-      const stats = await Investment.aggregate([
-        {
-          $match: {
-            userId: userId,
-            status: { $in: ['active', 'completed'] }
-          }
-        },
-        {
-          $group: {
-            _id: null,
-            totalReturns: { $sum: '$returns' },
-            returns: { $sum: '$returns' },  // Current returns is same as total returns for now
-            totalInvestments: { $sum: 1 },
-            activeInvestments: {
-              $sum: {
-                $cond: [{ $eq: ['$status', 'active'] }, 1, 0]
-              }
-            },
-            projectedReturns: {
-              $sum: {
-                $multiply: ['$amount', 0.15] // 15% projected returns
-              }
-            }
-          }
-        },
-        {
-          $project: {
-            _id: 0,
-            totalDeposits: 1,
-            totalReturns: 1,
-            returns: 1,
-            totalInvestments: 1,
-            activeInvestments: 1,
-            projectedReturns: 1
-          }
-        }
-      ]);
-
-      // Combine the stats
-      const defaultStats = {
-        totalDeposits: totalActiveDeposits[0]?.total || 0,
-        totalReturns: 0,
-        returns: 0,
-        totalInvestments: 0,
-        activeInvestments: 0,
-        projectedReturns: 0
+      // Get all investments
+      const investments = await Investment.find({ userId });
+      
+      // Calculate stats directly from investments
+      const activeInvestments = investments.filter(inv => inv.status === 'active');
+      
+      const stats = {
+        totalDeposits: activeInvestments.reduce((sum, inv) => sum + inv.amount, 0),
+        totalReturns: investments
+          .filter(inv => inv.status === 'active' || inv.status === 'completed')
+          .reduce((sum, inv) => sum + inv.returns, 0),
+        returns: investments
+          .filter(inv => inv.status === 'active' || inv.status === 'completed')
+          .reduce((sum, inv) => sum + inv.returns, 0),
+        totalInvestments: investments.length,
+        activeInvestments: activeInvestments.length,
+        projectedReturns: activeInvestments.reduce((sum, inv) => sum + (inv.amount * 0.15), 0)
       };
 
-      const finalStats = stats[0]
-        ? { ...stats[0], totalDeposits: totalActiveDeposits[0]?.total || 0 }
-        : defaultStats;
+      console.log('Calculated stats:', stats);
 
       res.json({
         status: 'success',
-        data: finalStats
+        data: stats
       });
     } catch (error) {
       console.error('Get user stats error:', error);
