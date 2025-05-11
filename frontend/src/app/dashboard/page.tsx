@@ -177,6 +177,9 @@ return (
                   <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Returns
                   </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Total Expected Returns
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
@@ -201,6 +204,9 @@ return (
                   </td>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-green-400">
                     +KES {investment.returns.toLocaleString()}
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-purple-400">
+                    KES {(investment.returns + (stats.projectedReturns / stats.activeInvestments)).toLocaleString()}
                   </td>
                 </tr>
               ))}
