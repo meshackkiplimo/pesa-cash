@@ -38,8 +38,16 @@ export const InvestmentTimer = ({ startDate, durationDays }: InvestmentTimerProp
   }, [startDate, durationDays]);
 
   return (
-    <div className="text-sm font-medium">
-      Time Remaining: {timeLeft}
+    <div className="text-sm font-medium group">
+      <span className="text-gray-400">Time Remaining: </span>
+      <span className="text-amber-400 font-bold hover:text-amber-300 transition-colors duration-200 shadow-glow">
+        {timeLeft}
+      </span>
+      <style jsx>{`
+        .shadow-glow {
+          text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+        }
+      `}</style>
     </div>
   );
 };

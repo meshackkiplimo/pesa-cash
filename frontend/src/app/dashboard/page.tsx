@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { investmentService } from '@/services/investment';
 import { Investment, InvestmentStats } from '@/types/investment';
+import InvestmentTimer from '@/components/InvestmentTimer';
 
 const DashboardPage = () => {
   const [stats, setStats] = useState<InvestmentStats | null>(null);
@@ -197,12 +198,15 @@ return (
                   <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Total Expected Returns
                   </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Duration
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
               {filteredInvestments.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 sm:px-6 py-8 text-center text-gray-400">
+                  <td colSpan={6} className="px-4 sm:px-6 py-8 text-center text-gray-400">
                     {showPastInvestments
                       ? "No past investments found. Your investments will appear here when they complete their cycle."
                       : "No active investments found. Start investing to see your investments here."}
@@ -233,6 +237,16 @@ return (
                   </td>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-purple-400">
                     KES {(investment.dailyReturn * investment.cycleDays).toLocaleString()}
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {investment.status === 'active' ? (
+                      <InvestmentTimer
+                        startDate={new Date(investment.date)}
+                        durationDays={investment.cycleDays}
+                      />
+                    ) : (
+                      <span>Complete</span>
+                    )}
                   </td>
                 </tr>
               )))}

@@ -6,6 +6,7 @@ import { investmentService } from '@/services/investment';
 import { Investment, TransactionDetails, InvestmentStats } from '@/types/investment';
 import IndividualInvestmentNavbar from '@/components/IndividualInvestmentNavbar';
 import TransactionDetailsModal from '@/components/TransactionDetailsModal';
+import InvestmentTimer from '@/components/InvestmentTimer';
 
 export default function IndividualInvestmentPage() {
   const { user } = useAuth();
@@ -151,6 +152,17 @@ export default function IndividualInvestmentPage() {
                       KES {(investment.dailyReturn * investment.cycleDays).toLocaleString()}
                     </p>
                   </div>
+                  {investment.status === 'active' && (
+                    <div className="col-span-6 mt-4">
+                      <p className="text-gray-400 text-sm mb-2">Duration</p>
+                      <div className="bg-gray-900/50 rounded-lg p-3 inline-block">
+                        <InvestmentTimer
+                          startDate={new Date(investment.date)}
+                          durationDays={investment.cycleDays}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div>
                     {investment.transactionDetails && (
                       <button
