@@ -2,7 +2,71 @@ import { Request, Response } from 'express';
 import { User } from '../models/User';
 import { Investment } from '../models/Investment';
 
+// Helper function to get monthly data
+const getMonthlyData = (data: any[], dateField: string, valueField: string) => {
+  const monthlyData = data.reduce((acc: { [key: string]: number }, item: any) => {
+    const date = new Date(item[dateField]);
+    const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    acc[monthYear] = (acc[monthYear] || 0) + (valueField ? item[valueField] : 1);
+    return acc;
+  }, {});
+
+  // Get last 6 months
+  const today = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const monthYear = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    months.push({
+      month: monthYear,
+      amount: monthlyData[monthYear] || 0
+    });
+  }
+  return months;
+};
+
 export const adminController = {
+  // Get dashboard statistics
+  async getDashboardStats(req: Request, res: Response) {
+    try {
+      // Get all users
+      const users = await User.find();
+      const totalUsers = users.length;
+      const activeUsers = users.filter(user => user.isActive).length;
+
+      // Get all investments
+      const investments = await Investment.find();
+      const totalInvestments = investments.length;
+      const activeInvestments = investments.filter(inv => inv.status === 'active').length;
+
+      // Calculate totals
+      const totalDeposits = investments.reduce((sum, inv) => sum + inv.amount, 0);
+      const totalReturns = investments.reduce((sum, inv) => sum + inv.returns, 0);
+
+      // Get monthly data
+      const monthlyInvestments = getMonthlyData(investments, 'date', 'amount');
+      const monthlyReturns = getMonthlyData(investments, 'date', 'returns');
+
+      // Get user growth (based on user creation dates)
+      const userGrowth = getMonthlyData(users, 'createdAt', '');
+
+      res.json({
+        totalUsers,
+        activeUsers,
+        totalInvestments,
+        activeInvestments,
+        totalDeposits,
+        totalReturns,
+        monthlyInvestments,
+        monthlyReturns,
+        userGrowth
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      res.status(500).json({ message: 'Error fetching dashboard statistics' });
+    }
+  },
+
   // Get all users
   async getUsers(req: Request, res: Response) {
     try {

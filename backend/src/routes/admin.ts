@@ -15,6 +15,9 @@ router.get('/users/:userId', adminController.getUserDetails);
 router.patch('/users/:userId/role', adminController.updateUserRole);
 router.patch('/users/:userId/status', adminController.updateUserStatus);
 
+// Dashboard routes
+router.get('/dashboard-stats', adminController.getDashboardStats);
+
 // Investment routes
 router.get('/investments', adminController.getInvestments);
 router.delete('/investments/:investmentId', adminController.deleteInvestment);

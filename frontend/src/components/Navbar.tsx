@@ -25,12 +25,21 @@ export default function Navbar() {
               </span>
             </Link>
             <div className="hidden md:flex ml-10 space-x-8">
-              <Link
-                href="/dashboard"
-                className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
-              >
-                Dashboard
-              </Link>
+              {user?.role === 'admin' ? (
+                <Link
+                  href="/admin/dashboard"
+                  className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/dashboard"
+                  className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
+                >
+                  Dashboard
+                </Link>
+              )}
               {isAuthenticated && (
                 <>
                   <Link
@@ -145,13 +154,23 @@ export default function Navbar() {
       {/* Mobile menu */}
       <div className={`${mobileMenuOpen ? 'block' : 'hidden'} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-900/95 backdrop-blur-sm">
-          <Link
-            href="/dashboard"
-            className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Dashboard
-          </Link>
+          {user?.role === 'admin' ? (
+            <Link
+              href="/admin/dashboard"
+              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/dashboard"
+              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+          )}
           {isAuthenticated && (
            <>
              <Link

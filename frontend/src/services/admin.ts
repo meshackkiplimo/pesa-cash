@@ -4,7 +4,43 @@ import { Investment } from '@/types/investment';
 import { API_URL } from '@/config';
 const BASE_URL = `${API_URL}/admin`;
 
+export interface AdminDashboardStats {
+  totalUsers: number;
+  activeUsers: number;
+  totalInvestments: number;
+  activeInvestments: number;
+  totalDeposits: number;
+  totalReturns: number;
+  monthlyInvestments: {
+    month: string;
+    amount: number;
+  }[];
+  monthlyReturns: {
+    month: string;
+    amount: number;
+  }[];
+  userGrowth: {
+    month: string;
+    count: number;
+  }[];
+}
+
 export const adminService = {
+  async getDashboardStats(): Promise<AdminDashboardStats> {
+    const response = await fetch(`${BASE_URL}/dashboard-stats`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch dashboard statistics');
+    }
+
+    return response.json();
+  },
+
   async getUsers(): Promise<User[]> {
     const response = await fetch(`${BASE_URL}/users`, {
       headers: {
