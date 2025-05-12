@@ -56,12 +56,6 @@ export default function Navbar() {
                         Manage Users
                       </Link>
                       <Link
-                        href="/admin/investments"
-                        className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
-                      >
-                        Manage Investments
-                      </Link>
-                      <Link
                         href="/admin/statistics"
                         className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-800/50 rounded-lg"
                       >
@@ -184,13 +178,6 @@ export default function Navbar() {
                    onClick={() => setMobileMenuOpen(false)}
                  >
                    Manage Users
-                 </Link>
-                 <Link
-                   href="/admin/investments"
-                   className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-gray-800/50"
-                   onClick={() => setMobileMenuOpen(false)}
-                 >
-                   Manage Investments
                  </Link>
                  <Link
                    href="/admin/statistics"
