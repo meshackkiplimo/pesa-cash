@@ -32,6 +32,7 @@ export const adminService = {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -47,6 +48,7 @@ export const adminService = {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -63,6 +65,7 @@ export const adminService = {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ isActive }),
     });
 
@@ -80,6 +83,7 @@ export const adminService = {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ role }),
     });
 
@@ -96,6 +100,7 @@ export const adminService = {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -112,6 +117,7 @@ export const adminService = {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {

@@ -31,8 +31,10 @@ app.use(cors({
         'https://api.safaricom.co.ke',    // M-Pesa production
         'https://sandbox.safaricom.co.ke'  // M-Pesa sandbox
       ]
-    : true,
-  credentials: true
+    : ['http://localhost:3000'], // Development frontend URL
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Rate limiting
