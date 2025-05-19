@@ -1,7 +1,16 @@
 import { User } from '@/types/auth';
 import { Investment } from '@/types/investment';
-
 import { API_URL } from '@/config';
+
+export interface AdminUser {
+  _id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  role: 'user' | 'admin';
+  isActive: boolean;
+  createdAt: string;
+}
 const BASE_URL = `${API_URL}/admin`;
 
 export interface AdminDashboardStats {
@@ -42,7 +51,7 @@ export const adminService = {
     return response.json();
   },
 
-  async getUsers(): Promise<User[]> {
+  async getUsers(): Promise<AdminUser[]> {
     const response = await fetch(`${BASE_URL}/users`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -58,7 +67,7 @@ export const adminService = {
     return response.json();
   },
 
-  async updateUserStatus(userId: string, isActive: boolean): Promise<User> {
+  async updateUserStatus(userId: string, isActive: boolean): Promise<AdminUser> {
     const response = await fetch(`${BASE_URL}/users/${userId}/status`, {
       method: 'PATCH',
       headers: {
@@ -76,7 +85,7 @@ export const adminService = {
     return response.json();
   },
 
-  async updateUserRole(userId: string, role: 'user' | 'admin'): Promise<User> {
+  async updateUserRole(userId: string, role: 'user' | 'admin'): Promise<AdminUser> {
     const response = await fetch(`${BASE_URL}/users/${userId}/role`, {
       method: 'PATCH',
       headers: {
