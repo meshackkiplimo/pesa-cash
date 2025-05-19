@@ -3,6 +3,7 @@ import { Request } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { mpesaService } from '../services/mpesa';
 import { Investment } from '../models/Investment';
+import { User } from '../models/User';
 
 interface InvestmentRequest {
   amount: number;
@@ -354,16 +355,45 @@ export const investmentController = {
 
   async getStats(req: AuthRequest, res: Response) {
     try {
-      const investments = await Investment.find({ status: 'active' });
-      const totalDeposits = investments.reduce((sum, inv) => sum + inv.amount, 0);
+      // Get all investments
+      const allInvestments = await Investment.find();
+      const activeInvestments = allInvestments.filter(inv => inv.status === 'active');
 
-      console.log('Found total investments:', investments.length);
-      console.log('Calculated total deposits:', totalDeposits);
+      // Get all users
+      const users = await User.find();
+      const totalUsers = users.length;
+      const activeUsers = users.filter(user => user.isActive).length;
+
+      // Calculate investment statistics
+      const totalDeposits = allInvestments.reduce((sum, inv) => sum + inv.amount, 0);
+      const totalReturns = allInvestments.reduce((sum, inv) => sum + (inv.returns || 0), 0);
+      const projectedReturns = activeInvestments.reduce((sum, inv) => {
+        const totalExpectedReturns = inv.dailyReturn * inv.cycleDays;
+        const remainingReturns = totalExpectedReturns - (inv.returns || 0);
+        return sum + (remainingReturns > 0 ? remainingReturns : 0);
+      }, 0);
+
+      console.log('Calculated platform statistics:', {
+        totalUsers,
+        activeUsers,
+        totalDeposits,
+        totalReturns,
+        activeInvestments: activeInvestments.length,
+        totalInvestments: allInvestments.length,
+        projectedReturns
+      });
 
       res.json({
         status: 'success',
         data: {
-          totalDeposits
+          totalUsers,
+          activeUsers,
+          totalDeposits,
+          totalReturns,
+          activeInvestments: activeInvestments.length,
+          totalInvestments: allInvestments.length,
+          projectedReturns,
+          returns: totalReturns // For backward compatibility
         }
       });
     } catch (error) {

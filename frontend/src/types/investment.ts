@@ -44,6 +44,8 @@ export interface InvestmentStats {
   activeInvestments: number;
   totalInvestments: number;
   projectedReturns: number;
+  totalUsers: number;
+  activeUsers: number;
 }
 
 export interface PaymentStatusResponse {

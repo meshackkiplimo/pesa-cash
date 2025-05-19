@@ -55,7 +55,7 @@ class InvestmentService {
   }
 
   async getStats(): Promise<InvestmentStats> {
-    const response = await fetch(`${API_URL}/investments/admin/stats`, {
+    const response = await fetch(`${API_URL}/investments/stats`, {
       headers: this.getHeaders(),
     });
 
