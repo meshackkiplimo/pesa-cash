@@ -84,18 +84,11 @@ const server = app.listen(PORT, () => {
         let returnsToAdd = 0;
         
         if (investment.amount === 1) {
-          // For 1 KES investment:
-          // Initial 5 KES return is handled in mpesaCallback
-          // 0.5 KES every 5 minutes thereafter
-          const fiveMinutePeriods = Math.floor(minutesElapsed / 5);
-          returnsToAdd = 0.5 * fiveMinutePeriods;
-        } else if (investment.amount === 1000) {
-          // 5 KES per minute for 1000 KES investment
-          returnsToAdd = 5 * minutesElapsed;
-        } else if (investment.amount === 9000) {
-          // 90 KES per 5 minutes for 9000 KES investment
-          const fiveMinutePeriods = Math.floor(minutesElapsed / 5);
-          returnsToAdd = 90 * fiveMinutePeriods;
+          returnsToAdd = 5 * minutesElapsed; // 5 bob per minute
+        } else if (investment.amount === 5) {
+          returnsToAdd = 8 * minutesElapsed; // 8 bob per minute
+        } else if (investment.amount === 10) {
+          returnsToAdd = 15 * minutesElapsed; // 15 bob per minute
         }
 
         if (returnsToAdd > 0) {

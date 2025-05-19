@@ -16,37 +16,42 @@ const calculateReturns = async (investment: any) => {
   const now = new Date();
   const startDate = investment.date;
   const lastUpdate = investment.lastReturnsUpdate;
-  const minutesElapsed = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60));
   const totalDaysElapsed = (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
 
-  let returnsToAdd = 0;
   let cycleDays = 0;
+  let ratePerMinute = 0;
   
-  // Define cycle days based on investment amount
-  if (investment.amount === 1) cycleDays = 3;
-  else if (investment.amount === 5) cycleDays = 6;
-  else if (investment.amount === 10) cycleDays = 8;
+  // Define cycle days and rates based on investment amount
+  if (investment.amount === 1) {
+    cycleDays = 3;
+    ratePerMinute = 5; // 5 bob per minute
+  } else if (investment.amount === 5) {
+    cycleDays = 6;
+    ratePerMinute = 8; // 8 bob per minute
+  } else if (investment.amount === 10) {
+    cycleDays = 8;
+    ratePerMinute = 15; // 15 bob per minute
+  }
 
   // Only calculate returns if within cycle period
   if (totalDaysElapsed <= cycleDays) {
-    if (investment.amount === 1) {
-      returnsToAdd = 5 * minutesElapsed; // 5 bob per minute
-    } else if (investment.amount === 5) {
-      returnsToAdd = 8 * minutesElapsed; // 8 bob per minute
-    } else if (investment.amount === 10) {
-      returnsToAdd = 15 * minutesElapsed; // 15 bob per minute
-    }
-
-    if (returnsToAdd > 0) {
-      investment.returns += returnsToAdd;
+    // Calculate total returns up to now based on total minutes since start
+    const totalMinutesElapsed = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60));
+    const expectedTotalReturns = ratePerMinute * totalMinutesElapsed;
+    
+    // Set returns to expected total (this handles offline periods)
+    if (expectedTotalReturns > investment.returns) {
+      investment.returns = expectedTotalReturns;
       investment.lastReturnsUpdate = now;
     }
   } else {
-    // Only complete the investment if we've reached the exact cycle end
-    // This ensures investments stay active until their full cycle completes
-    const daysOverCycle = totalDaysElapsed - cycleDays;
-    if (daysOverCycle >= 0 && daysOverCycle < 1) { // Complete only when just past cycle
+    // Complete the investment if cycle is over
+    if (!investment.status || investment.status === 'active') {
       investment.status = 'completed';
+      
+      // Ensure final returns are set correctly
+      const totalMinutes = cycleDays * 24 * 60; // Convert days to minutes
+      investment.returns = ratePerMinute * totalMinutes;
     }
   }
 
