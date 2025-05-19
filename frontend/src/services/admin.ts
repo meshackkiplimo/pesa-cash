@@ -10,6 +10,8 @@ export interface AdminUser {
   role: 'user' | 'admin';
   isActive: boolean;
   createdAt: string;
+  totalInvested: number;
+  totalProfits: number;
 }
 const BASE_URL = `${API_URL}/admin`;
 

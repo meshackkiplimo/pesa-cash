@@ -75,6 +75,8 @@ export default function UsersPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">User</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Role</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Total Invested</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Total Profits</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Joined</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
@@ -111,6 +113,12 @@ export default function UsersPage() {
                     >
                       {user.isActive ? 'Active' : 'Inactive'}
                     </button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                    KES {user.totalInvested.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                    KES {user.totalProfits.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                     {new Date(user.createdAt).toLocaleDateString()}

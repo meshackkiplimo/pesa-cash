@@ -70,8 +70,24 @@ export const adminController = {
   // Get all users
   async getUsers(req: Request, res: Response) {
     try {
-      const users = await User.find({}, '-password');
-      res.json(users);
+      const users = await User.find({}, '-password').lean();
+      const investments = await Investment.find().populate('userId');
+
+      const usersWithStats = users.map((user: any) => {
+        const userInvestments = investments.filter(
+          inv => inv.userId._id?.toString() === user._id.toString()
+        );
+        const totalInvested = userInvestments.reduce((sum, inv) => sum + inv.amount, 0);
+        const totalProfits = userInvestments.reduce((sum, inv) => sum + inv.returns, 0);
+
+        return {
+          ...user,
+          totalInvested,
+          totalProfits
+        };
+      });
+
+      res.json(usersWithStats);
     } catch (error) {
       res.status(500).json({ message: 'Error fetching users' });
     }
