@@ -1,8 +1,8 @@
 # Pesa Cash Deployment Guide
 
-This project consists of two parts that will be deployed on Render:
-- Backend: Node.js/TypeScript API
-- Frontend: Next.js application
+This project consists of two parts:
+- Backend: Node.js/TypeScript API (Render)
+- Frontend: Next.js application (Vercel)
 
 ## Backend Deployment on Render
 
@@ -50,36 +50,34 @@ This project consists of two parts that will be deployed on Render:
 
 6. Click "Create Web Service"
 
-## Frontend Deployment on Render
+## Frontend Deployment on Vercel
 
-1. Go to [Render Dashboard](https://dashboard.render.com)
-2. Click "New +" and select "Static Site"
-3. Connect your GitHub repository
-4. Configure the frontend service:
-   - Name: `pesa-cash-frontend` (or your preferred name)
-   - Branch: `main` (or your deployment branch)
+1. Go to [Vercel Dashboard](https://vercel.com)
+2. Click "Add New" → "Project"
+3. Import your GitHub repository
+4. Configure project settings:
+   - Framework Preset: Next.js (should be auto-detected)
    - Root Directory: `frontend`
-   - Build Command: `npm install && npm run build`
-   - Publish Directory: `.next`
+   - Build Settings: Keep defaults
 
-5. Add the following environment variables:
+5. Add Environment Variables:
    ```
    NEXT_PUBLIC_API_URL=https://your-backend-name.onrender.com/api
    MDG=true
    GTR=false
    ```
 
-6. Click "Create Static Site"
+6. Click "Deploy"
 
 ## Post-Deployment Steps
 
-1. After the backend deploys:
-   - Copy your backend deployment URL (e.g., https://pesa-cash-api.onrender.com)
-   - You'll need this URL for the frontend configuration
+1. After the backend deploys on Render:
+   - Copy your backend deployment URL
+   - Update the frontend's `NEXT_PUBLIC_API_URL` in Vercel project settings
+   - Format: `https://your-backend-name.onrender.com/api`
 
-2. After frontend deploys:
-   - Ensure the `NEXT_PUBLIC_API_URL` points to your backend API URL
-   - Test the application by visiting your frontend Render URL
+2. After frontend deploys on Vercel:
+   - Test the application by visiting your Vercel URL
    - Login with your admin credentials
    - Change the admin password immediately
 
@@ -96,8 +94,8 @@ This project consists of two parts that will be deployed on Render:
    - Never commit sensitive information to Git
 
 3. Monitoring:
-   - Monitor your Render logs for both services
-   - Check service status regularly
+   - Check Render logs for backend issues
+   - Monitor Vercel deployment for frontend status
    - Set up alerts for service disruptions
 
 4. Troubleshooting Common Issues:
@@ -109,15 +107,15 @@ This project consists of two parts that will be deployed on Render:
    - Check if the port configuration is correct
 
    Frontend Issues:
-   - Verify the API URL is correct
-   - Check build logs for any compilation errors
+   - Verify the API URL is correct in Vercel environment variables
+   - Check Vercel build logs for any compilation errors
    - Clear browser cache if seeing outdated content
    - Ensure Next.js build is completing successfully
 
 5. Performance:
-   - Monitor response times
-   - Check resource usage in Render dashboard
-   - Consider upgrading instance types if needed
+   - Monitor backend response times in Render
+   - Use Vercel Analytics for frontend performance
+   - Consider upgrading Render instance type if needed
 
 6. Maintenance:
    - Regularly update dependencies
