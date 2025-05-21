@@ -59,6 +59,7 @@ This project consists of two parts:
    - Framework Preset: Next.js (should be auto-detected)
    - Root Directory: `frontend`
    - Build Settings: Keep defaults
+   - Production Branch: main (or your deployment branch)
 
 5. Add Environment Variables:
    ```
@@ -68,6 +69,8 @@ This project consists of two parts:
    ```
 
 6. Click "Deploy"
+
+Note: The project is configured to ignore ESLint and TypeScript errors during build (in `frontend/next.config.js`) to ensure successful deployment. It's recommended to fix these issues in development for better code quality.
 
 ## Post-Deployment Steps
 
@@ -93,34 +96,24 @@ This project consists of two parts:
    - Keep your environment variables secure
    - Never commit sensitive information to Git
 
-3. Monitoring:
-   - Check Render logs for backend issues
-   - Monitor Vercel deployment for frontend status
-   - Set up alerts for service disruptions
+3. Troubleshooting Common Issues:
 
-4. Troubleshooting Common Issues:
-
-   Backend Issues:
+   Backend (Render):
    - Check Render logs for errors
    - Verify MongoDB connection
    - Ensure all environment variables are set correctly
    - Check if the port configuration is correct
 
-   Frontend Issues:
-   - Verify the API URL is correct in Vercel environment variables
-   - Check Vercel build logs for any compilation errors
+   Frontend (Vercel):
+   - Verify the API URL is correct in environment variables
+   - Check build logs for any remaining issues
    - Clear browser cache if seeing outdated content
-   - Ensure Next.js build is completing successfully
+   - Ensure all dependencies are properly installed
 
-5. Performance:
-   - Monitor backend response times in Render
-   - Use Vercel Analytics for frontend performance
-   - Consider upgrading Render instance type if needed
-
-6. Maintenance:
-   - Regularly update dependencies
-   - Monitor security advisories
-   - Backup your database regularly
-   - Keep environment variables up to date
+4. Development Improvements:
+   - Fix ESLint and TypeScript errors in the code
+   - Remove the build error ignores in next.config.js once fixed
+   - Implement proper error handling
+   - Add proper TypeScript types where 'any' is used
 
 Remember to always test your deployment in a staging environment first before deploying to production.
