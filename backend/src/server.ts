@@ -24,18 +24,17 @@ connectDB().then(() => {
 // Security Middleware
 app.use(helmet()); // Adds various HTTP headers for security
 // Allow CORS for frontend and M-Pesa
+// Enable CORS
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? [
-        'https://pesa-cash.vercel.app', // Replace with your frontend domain
-        'https://api.safaricom.co.ke',    // M-Pesa production
-        'https://sandbox.safaricom.co.ke'  // M-Pesa sandbox
-      ]
-    : ['http://localhost:3000'], // Development frontend URL
+  origin: true, // Allow all origins temporarily for debugging
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  exposedHeaders: ['Access-Control-Allow-Origin']
 }));
+
+// Add pre-flight OPTIONS handling
+app.options('*', cors()); // Handle pre-flight requests
 
 // Rate limiting
 const limiter = rateLimit({
