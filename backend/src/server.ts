@@ -94,7 +94,6 @@ const server = app.listen(PORT, () => {
           investment.returns += returnsToAdd;
           investment.lastReturnsUpdate = now;
           await investment.save();
-          console.log(`Updated returns for investment ${investment._id}: +${returnsToAdd} KES`);
         }
       }
     } catch (error) {

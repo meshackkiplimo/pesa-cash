@@ -104,8 +104,6 @@ export const investmentController = {
       await investment.save();
 
       const stkPushResponse = await mpesaService.initiateSTKPush(phoneNumber, amount);
-      
-      console.log('M-Pesa STK Push Response:', JSON.stringify(stkPushResponse, null, 2));
 
       if (!stkPushResponse.CheckoutRequestID || !stkPushResponse.MerchantRequestID) {
         console.error('Invalid M-Pesa response:', stkPushResponse);
@@ -168,8 +166,6 @@ export const investmentController = {
         if (!mpesaReceiptNumber) {
           console.error('M-Pesa receipt number not found in callback data');
         }
-
-        console.log('M-Pesa transaction metadata:', JSON.stringify(metadata, null, 2));
 
         investment.status = 'active';
         investment.lastReturnsUpdate = new Date(); // Set initial returns update time
@@ -342,8 +338,6 @@ export const investmentController = {
           return sum + (remainingReturns > 0 ? remainingReturns : 0);
         }, 0)
       };
-
-      console.log('Calculated stats:', stats);
 
       res.json({
         status: 'success',

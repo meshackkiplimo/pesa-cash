@@ -18,10 +18,6 @@ export const setupAdminUser = async () => {
       });
 
       await adminUser.save();
-      console.log('Admin user created successfully');
-      console.log('Default admin email:', config.admin.email);
-      console.log('Default admin password:', config.admin.password);
-      console.log('Please change the admin password after first login');
     }
   } catch (error) {
     console.error('Error setting up admin user:', error);
