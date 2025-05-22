@@ -27,7 +27,7 @@ app.use(helmet()); // Adds various HTTP headers for security
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
     ? [
-        'https://yourfrontenddomain.com', // Replace with your frontend domain
+        'https://pesa-cash.vercel.app', // Replace with your frontend domain
         'https://api.safaricom.co.ke',    // M-Pesa production
         'https://sandbox.safaricom.co.ke'  // M-Pesa sandbox
       ]
