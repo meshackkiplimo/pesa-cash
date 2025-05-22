@@ -372,16 +372,7 @@ export const investmentController = {
         return sum + (remainingReturns > 0 ? remainingReturns : 0);
       }, 0);
 
-      console.log('Calculated platform statistics:', {
-        totalUsers,
-        activeUsers,
-        totalDeposits,
-        totalReturns,
-        activeInvestments: activeInvestments.length,
-        totalInvestments: allInvestments.length,
-        projectedReturns
-      });
-
+      
       res.json({
         status: 'success',
         data: {
