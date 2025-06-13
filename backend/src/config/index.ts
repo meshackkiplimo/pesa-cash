@@ -15,6 +15,7 @@ interface Config {
   emailUser: string;
   emailPass: string;
   emailFrom: string;
+  openaiApiKey: string;
   mpesa: {
     consumerKey: string;
     consumerSecret: string;
@@ -43,6 +44,7 @@ export const config: Config = {
   emailUser: process.env.EMAIL_USER || '',
   emailPass: process.env.EMAIL_PASS || '',
   emailFrom: process.env.EMAIL_FROM || 'noreply@pesacash.com',
+  openaiApiKey: process.env.OPENAI_API_KEY || '',
   mpesa: {
     consumerKey: process.env.MPESA_CONSUMER_KEY || '',
     consumerSecret: process.env.MPESA_CONSUMER_SECRET || '',

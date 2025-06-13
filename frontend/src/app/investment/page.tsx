@@ -5,6 +5,7 @@ import { investmentService } from '@/services/investment';
 import { useRouter } from 'next/navigation';
 import PaymentModal from '@/components/modals/PaymentModal';
 import InvestmentTimer from '@/components/InvestmentTimer';
+import ChatBot from '@/components/ChatBot';
 
 const InvestmentPage = () => {
   const router = useRouter();
@@ -13,6 +14,7 @@ const InvestmentPage = () => {
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
   const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
+  
   interface InvestmentOption {
     amount: number;
     dailyReturn: number;
@@ -33,7 +35,6 @@ const InvestmentPage = () => {
   const calculateTotalReturns = (option: InvestmentOption) => {
     return option.dailyReturn * option.durationDays;
   };
-
 
   const handleStatusChange = (newStatus: 'idle' | 'pending' | 'success' | 'failed', message: string) => {
     setPaymentStatus(newStatus);
@@ -124,6 +125,9 @@ const InvestmentPage = () => {
         status={paymentStatus}
         statusMessage={statusMessage}
       />
+
+      {/* AI Investment Assistant */}
+      <ChatBot />
     </div>
   );
 };

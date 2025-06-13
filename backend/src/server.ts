@@ -11,6 +11,7 @@ import { errorHandler, notFound } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
 import investmentRoutes from './routes/investment';
 import adminRoutes from './routes/admin';
+import aiRoutes from './routes/ai';
 import { Investment } from './models/Investment';
 
 // Initialize express app
@@ -56,6 +57,7 @@ if (config.nodeEnv === 'development') {
 app.use('/api/auth', authRoutes);
 app.use('/api/investments', investmentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Error Handling
 app.use(notFound);
@@ -104,7 +106,7 @@ const server = app.listen(PORT, () => {
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err: Error) => {
-  
+  console.error('Unhandled Promise Rejection:', err);
   server.close(() => {
     process.exit(1);
   });
@@ -112,7 +114,7 @@ process.on('unhandledRejection', (err: Error) => {
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err: Error) => {
-  
+  console.error('Uncaught Exception:', err);
   process.exit(1);
 });
 
